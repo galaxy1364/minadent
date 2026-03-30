@@ -7,56 +7,34 @@
     <title>MinaDent Ultra 2026</title>
     <style>
         :root {
-            --teal: #008080;
-            --bg: #09090b;
-            --debt-red: #ff453a;
-            --paid-green: #32d74b;
-            --pending-orange: #ff9f0a;
+            --teal: #008080; --bg: #09090b; --debt-red: #ff453a; --paid-green: #32d74b; --pending-orange: #ff9f0a;
         }
         body { margin: 0; background: var(--bg); color: white; font-family: -apple-system, sans-serif; overflow: hidden; height: 100vh; }
+        .header { padding: 50px 20px 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .app-rail { display: flex; width: 400vw; height: calc(100vh - 160px); transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1); }
+        .page { width: 100vw; overflow-y: auto; padding: 20px; box-sizing: border-box; padding-bottom: 100px; }
         
-        /* هدر مدیریت */
-        .header { padding: 50px 20px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        
-        .app-rail { display: flex; width: 400vw; height: calc(100vh - 170px); transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1); }
-        .page { width: 100vw; overflow-y: auto; padding: 20px; box-sizing: border-box; }
+        .patient-card { border-radius: 22px; padding: 15px; margin-bottom: 15px; border: 2px solid transparent; backdrop-filter: blur(10px); }
+        .status-debt { background: rgba(255, 69, 58, 0.1); border-color: var(--debt-red); color: var(--debt-red); }
+        .status-paid { background: rgba(50, 215, 75, 0.1); border-color: var(--paid-green); color: var(--paid-green); }
+        .status-pending { background: rgba(255, 159, 10, 0.1); border-color: var(--pending-orange); color: var(--pending-orange); }
 
-        /* کارت‌های رنگی هوشمند بر اساس وضعیت */
-        .patient-card {
-            border-radius: 22px; padding: 20px; margin-bottom: 15px;
-            border: 2px solid transparent; backdrop-filter: blur(10px);
-            transition: 0.3s;
+        /* دکمه‌های شیشه‌ای و مدرن */
+        .btn-scan {
+            background: linear-gradient(135deg, var(--teal), #005555); color: white; border: none;
+            padding: 15px; border-radius: 18px; width: 100%; font-size: 16px; font-weight: bold;
+            display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 15px;
+            box-shadow: 0 10px 20px rgba(0, 128, 128, 0.3);
         }
 
-        /* استایل بدهکار (قرمز) */
-        .status-debt {
-            background: rgba(255, 69, 58, 0.1);
-            border-color: var(--debt-red);
-            color: var(--debt-red);
+        /* ورودی‌های فرم */
+        .input-glass {
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+            color: white; padding: 12px; border-radius: 12px; width: 100%; margin-bottom: 10px; box-sizing: border-box; font-family: inherit;
         }
-        .status-debt h4, .status-debt span { color: var(--debt-red); font-weight: 900; }
 
-        /* استایل تسویه (سبز) */
-        .status-paid {
-            background: rgba(50, 215, 75, 0.1);
-            border-color: var(--paid-green);
-            color: var(--paid-green);
-        }
-        .status-paid h4, .status-paid span { color: var(--paid-green); font-weight: 900; }
-
-        /* استایل موعد نرسیده (نارنجی) */
-        .status-pending {
-            background: rgba(255, 159, 10, 0.1);
-            border-color: var(--pending-orange);
-            color: var(--pending-orange);
-        }
-        .status-pending h4, .status-pending span { color: var(--pending-orange); font-weight: 900; }
-
-        .mablagh { font-size: 20px; display: block; margin-top: 5px; }
-
-        /* داک پایین */
-        .dock { position: fixed; bottom: 25px; left: 20px; right: 20px; height: 75px; background: rgba(255,255,255,0.08); backdrop-filter: blur(30px); border-radius: 28px; display: flex; justify-content: space-around; align-items: center; border: 1px solid rgba(255,255,255,0.1); }
-        .dock-item { opacity: 0.4; text-align: center; font-size: 11px; cursor: pointer; }
+        .dock { position: fixed; bottom: 25px; left: 20px; right: 20px; height: 75px; background: rgba(255,255,255,0.08); backdrop-filter: blur(30px); border-radius: 28px; display: flex; justify-content: space-around; align-items: center; border: 1px solid rgba(255,255,255,0.1); z-index: 1000; }
+        .dock-item { opacity: 0.4; text-align: center; font-size: 11px; cursor: pointer; transition: 0.3s; }
         .dock-item.active { opacity: 1; color: var(--teal); transform: scale(1.1); }
     </style>
 </head>
@@ -68,31 +46,62 @@
     </div>
 
     <div class="app-rail" id="mainRail">
+        
         <section class="page">
-            <h3 style="color:var(--teal); margin-bottom:20px;">لیست بیماران و تراکنش‌ها</h3>
+            <h3 style="color:var(--teal); margin-bottom:15px;">لیست بیماران و تراکنش‌ها</h3>
             
             <div class="patient-card status-debt">
-                <h4>🔴 مریم احمدی (بدهکار)</h4>
+                <h4 style="margin:0 0 5px 0">🔴 مریم احمدی (بدهکار)</h4>
                 <span>باقیمانده: ۱۲,۵۰۰,۰۰۰ تومان</span>
-                <small style="display:block; margin-top:5px;">توضیحات: ایمپلنت واحد ۲ - تحویل روکش مانده</small>
             </div>
-
             <div class="patient-card status-pending">
-                <h4>🟠 رضا شاکری (موعد نرسیده)</h4>
+                <h4 style="margin:0 0 5px 0">🟠 رضا شاکری (موعد نرسیده)</h4>
                 <span>قسط بعدی: ۴,۰۰۰,۰۰۰ تومان</span>
-                <small style="display:block; margin-top:5px;">تاریخ سررسید: ۱۵ دی ماه</small>
             </div>
 
-            <div class="patient-card status-paid">
-                <h4>🟢 علی علوی (تسویه کامل)</h4>
-                <span>کل پرداختی: ۳۵,۰۰۰,۰۰۰ تومان</span>
-                <small style="display:block; margin-top:5px;">بدون بدهی ✅</small>
+            <input type="file" accept="image/*" capture="environment" id="cameraInput" style="display:none;" onchange="processScan()">
+            <button class="btn-scan" onclick="document.getElementById('cameraInput').click()">
+                📸 اسکن فیش واریزی جدید
+            </button>
+            <p id="scanResult" style="color: var(--paid-green); font-size: 12px; text-align: center; margin-top: 10px;"></p>
+        </section>
+
+        <section class="page">
+            <h3 style="color:var(--teal); margin-bottom:15px;">پنل جراحی - دکتر مینا مازندرانی</h3>
+            <div style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 20px;">
+                <label style="font-size: 12px; opacity: 0.7;">کل هزینه دریافتی (تومان):</label>
+                <input type="number" id="totalFee" class="input-glass" placeholder="مثلاً 20000000">
+                
+                <label style="font-size: 12px; opacity: 0.7;">هزینه فیکسچر و اباتمنت (سهم ۱۰۰٪ مدیر):</label>
+                <input type="number" id="materialFee" class="input-glass" placeholder="مثلاً 8000000">
+                
+                <button class="btn-scan" onclick="calculateImplant()" style="margin-top: 10px;">📊 محاسبه سهم</button>
+                
+                <div id="calcResult" style="margin-top: 15px; display: none;">
+                    <div style="background: rgba(50, 215, 75, 0.2); color: var(--paid-green); padding: 10px; border-radius: 10px; margin-bottom: 5px;">
+                        سهم دکتر مهدی (مدیر): <span id="mgrShare" style="font-weight:bold;">0</span> ت
+                    </div>
+                    <div style="background: rgba(0, 128, 128, 0.2); color: white; padding: 10px; border-radius: 10px;">
+                        سهم دکتر مینا: <span id="minaShare" style="font-weight:bold;">0</span> ت
+                    </div>
+                </div>
             </div>
         </section>
 
-        <section class="page"><h3>بخش جراحی</h3></section>
-        <section class="page"><h3>نوبت‌دهی</h3></section>
-        <section class="page"><h3>تنظیمات AI</h3></section>
+        <section class="page">
+            <h3 style="color:var(--teal); margin-bottom:15px;">نوبت‌دهی - پنل اکرم عیدی</h3>
+            <div class="input-glass" style="text-align: center; padding: 30px;">
+                <div style="font-size: 40px; margin-bottom: 10px;">📅</div>
+                ثبت نوبت سریع (نام + موبایل)
+                <br><br>
+                <button class="btn-scan" style="background: #333;">+ نوبت جدید</button>
+            </div>
+        </section>
+
+        <section class="page">
+            <h3 style="color:var(--teal);">تنظیمات سیستم</h3>
+            <p style="opacity:0.6; font-size:14px;">پایگاه داده: SQLite (آفلاین)<br>وضعیت سینک: متصل به سرور</p>
+        </section>
     </div>
 
     <nav class="dock">
@@ -103,10 +112,39 @@
     </nav>
 
     <script>
+        // حرکت بین صفحات
         function move(idx, el) {
-            document.getElementById('mainRail').style.transform = `translateX(${idx * 100}vw)`;
+            document.getElementById('mainRail').style.transform = `translateX(${idx * -100}vw)`;
             document.querySelectorAll('.dock-item').forEach(d => d.classList.remove('active'));
             el.classList.add('active');
+        }
+
+        // شبیه‌سازی اسکن فیش بانکی
+        function processScan() {
+            let res = document.getElementById('scanResult');
+            res.innerText = "⏳ در حال تحلیل تصویر توسط هوش مصنوعی...";
+            setTimeout(() => {
+                res.innerText = "✅ اسکن موفق! مبلغ پرداختی استخراج شد و آماده ثبت در پرونده است.";
+            }, 2000);
+        }
+
+        // فرمول قطعی و قفل شده ایمپلنت
+        function calculateImplant() {
+            let total = parseInt(document.getElementById('totalFee').value) || 0;
+            let material = parseInt(document.getElementById('materialFee').value) || 0;
+            
+            // دستمزد خالص جراحی
+            let surgeryFee = total - material;
+            
+            // سهم مینا (50% از دستمزد خالص)
+            let minaShare = surgeryFee / 2;
+            
+            // سهم مدیر (100% قطعات + 50% دستمزد خالص)
+            let mgrShare = material + (surgeryFee / 2);
+
+            document.getElementById('mgrShare').innerText = mgrShare.toLocaleString();
+            document.getElementById('minaShare').innerText = minaShare.toLocaleString();
+            document.getElementById('calcResult').style.display = "block";
         }
     </script>
 </body>
