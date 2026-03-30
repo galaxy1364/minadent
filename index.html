@@ -4,115 +4,229 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <title>MinaDent Master 2026</title>
-    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
+    <title>MinaDent Master 2026 - Ultra Light</title>
     <style>
-        :root { --teal: #008080; --bg: #050505; --card: rgba(30,30,30,0.6); --red: #ff3b30; --green: #34c759; --orange: #ff9500; }
-        body { margin: 0; background: var(--bg); color: white; font-family: -apple-system, sans-serif; overflow-x: hidden; height: 100vh; }
+        :root {
+            --primary: #008080; --bg: #ffffff; --text: #000000;
+            --tile-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            /* تعریف رنگ‌های اختصاصی هر بخش */
+            --color-finance: #E0F7FA; --color-lab: #F3E5F5; --color-inventory: #FFF3E0; --color-appt: #E3F2FD;
+            --color-patient: #E8F5E9; --color-ai: #FFEBEE; --color-implant: #E0F2F1; --color-insurance: #FCE4EC;
+            --color-unit: #FFFDE7; --color-staff: #EFEBE9; --color-reports: #E8EAF6; --color-settings: #ECEFF1;
+        }
+
+        body { margin: 0; background: var(--bg); color: var(--text); font-family: -apple-system, sans-serif; overflow-x: hidden; height: 100vh; }
         
-        /* هدر فوق مدرن با افکت شیشه‌ای */
-        .glass-header {
-            padding: 55px 20px 20px; background: rgba(0,0,0,0.8); backdrop-filter: blur(20px);
-            position: sticky; top: 0; z-index: 2000; border-bottom: 1px solid rgba(255,255,255,0.1);
+        /* هدر روشن */
+        .header {
+            padding: 55px 20px 15px; background: rgba(255,255,255,0.9); backdrop-filter: blur(20px);
+            position: sticky; top: 0; z-index: 2000; border-bottom: 1px solid rgba(0,0,0,0.05);
             display: flex; justify-content: space-between; align-items: center;
         }
 
-        .search-bar {
-            background: rgba(255,255,255,0.07); border-radius: 15px; padding: 12px; margin: 15px 20px;
-            display: flex; align-items: center; gap: 10px; border: 1px solid rgba(255,255,255,0.1);
+        /* بخش جستجو */
+        .search-area {
+            background: rgba(0,0,0,0.03); border-radius: 20px; padding: 12px; margin: 15px 20px;
+            display: flex; align-items: center; gap: 10px; border: 1px solid rgba(0,0,0,0.05);
         }
+        .search-area input { background:none; border:none; color:black; width:100%; outline:none; font-family:inherit; }
 
-        .main-grid {
+        /* گرید ماژولار با قابلیت جابجایی */
+        .sortable-grid {
             display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 0 20px 120px;
+            -webkit-user-select: none; user-select: none;
         }
 
-        /* کارت‌های آیکونیک متحرک */
-        .module-card {
-            background: var(--card); border-radius: 28px; padding: 20px; text-align: center;
-            border: 1px solid rgba(255,255,255,0.05); transition: 0.3s; position: relative; overflow: hidden;
+        /* کارت‌های مدیریت با رنگ متفاوت */
+        .sortable-tile {
+            border-radius: 28px; padding: 22px; text-align: center;
+            border: 1px solid rgba(0,0,0,0.03); box-shadow: var(--tile-shadow);
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: grab;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
-        .module-card:active { transform: scale(0.95); background: rgba(0,128,128,0.2); }
-        .module-icon { font-size: 35px; display: block; margin-bottom: 10px; filter: drop-shadow(0 5px 15px rgba(0,0,0,0.5)); }
-        
-        .badge { position: absolute; top: 12px; right: 12px; background: var(--red); font-size: 10px; padding: 4px 8px; border-radius: 10px; }
+        .sortable-tile:active { cursor: grabbing; transform: scale(1.05); box-shadow: 0 15px 35px rgba(0,0,0,0.1); }
+        .module-icon { font-size: 38px; display: block; margin-bottom: 10px; filter: drop-shadow(0 5px 10px rgba(0,0,0,0.15)); }
+        .module-title { font-size: 14px; font-weight: bold; margin-top: 5px; }
+        .module-small { font-size: 11px; opacity: 0.7; margin-top: 2px; }
 
-        /* بخش لابراتوار اختصاصی */
-        .lab-item { background: rgba(255,255,255,0.03); border-radius: 15px; padding: 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+        /* کلاس برای زمان کشیدن و رها کردن */
+        .dragging { opacity: 0.5; transform: scale(0.9); border: 2px dashed var(--primary); }
 
-        .dock { position: fixed; bottom: 30px; left: 20px; right: 20px; height: 75px; background: rgba(20,20,20,0.9); backdrop-filter: blur(30px); border-radius: 35px; display: flex; justify-content: space-around; align-items: center; border: 1px solid rgba(255,255,255,0.1); z-index: 3000; }
-        .dock-item { color: rgba(255,255,255,0.4); text-align: center; font-size: 10px; }
-        .dock-item.active { color: var(--teal); }
+        /* پاپ‌آپ موقت مدیریت سهم */
+        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 4000; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
+        .popup { background: white; padding: 30px; border-radius: 25px; width: 85%; max-width: 400px; text-align: center; color: black; box-shadow: 0 10px 40px rgba(0,0,0,0.2); }
+        .form-group { margin-bottom: 15px; text-align: right; }
+        .form-group label { display: block; font-size: 12px; opacity: 0.7; margin-bottom: 5px; }
+        .form-input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 12px; box-sizing: border-box; }
+        .btn { background: var(--primary); color: white; border: none; padding: 14px; border-radius: 15px; width: 100%; font-weight: bold; margin-top: 15px; }
 
-        /* استایل مبالغ درخواستی */
-        .price-red { color: var(--red); font-weight: bold; }
-        .price-green { color: var(--green); font-weight: bold; }
-        .price-orange { color: var(--orange); font-weight: bold; }
+        /* داک پایین روشن */
+        .dock-bar { position: fixed; bottom: 30px; left: 20px; right: 20px; height: 75px; background: rgba(240,240,240,0.9); backdrop-filter: blur(30px); border-radius: 35px; display: flex; justify-content: space-around; align-items: center; border: 1px solid rgba(0,0,0,0.05); z-index: 3000; box-shadow: 0 -10px 30px rgba(0,0,0,0.05); }
+        .dock-btn { color: rgba(0,0,0,0.5); text-align: center; font-size: 10px; cursor: pointer; }
+        .dock-btn.active { color: var(--primary); font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <div class="glass-header">
-        <div><small style="opacity:0.5">MinaDent Ultra 2026</small><div style="font-size:22px; font-weight:900;">پنل مدیریت دکتر مهدی</div></div>
-        <div style="background:var(--teal); width:45px; height:45px; border-radius:15px; display:flex; align-items:center; justify-content:center; box-shadow: 0 0 20px rgba(0,128,128,0.4)">💎</div>
+    <div class="header">
+        <div><small style="opacity:0.6; color:#777;">Ultra Performance 2026</small><div style="font-size:22px; font-weight:900; color:black;">MinaDent Ultra - دکتر مهدی</div></div>
+        <div style="background:var(--primary); width:42px; height:42px; border-radius:12px; display:flex; align-items:center; justify-content:center; box-shadow: 0 5px 15px rgba(0,128,128,0.3)">💎</div>
     </div>
 
-    <div class="search-bar">
-        <span>🔍</span>
-        <input type="text" placeholder="جستجوی هوشمند صوتی یا متنی بیمار..." style="background:none; border:none; color:white; width:100%; outline:none;">
-        <span>🎤</span>
+    <div class="search-area">
+        <span style="font-size:18px">🔍</span>
+        <input type="text" placeholder="جستجوی پرونده، فیش، نوبت...">
     </div>
 
-    <div class="main-grid">
-        <div class="module-card" onclick="alert('بخش مالی باز شد')">
+    <div class="sortable-grid" id="sortableGrid">
+        <div class="sortable-tile" draggable="true" style="background-color: var(--color-finance)" onclick="showFinance()">
             <span class="module-icon">💰</span>
-            <div style="font-size:14px; font-weight:bold;">امور مالی</div>
-            <small style="font-size:10px; opacity:0.6;">مانده: <span class="price-red">۱۲.۵ م</span></small>
+            <div class="module-title">امور مالی و سود</div>
+            <div class="module-small">فرمول قفل مدیر</div>
         </div>
 
-        <div class="module-card">
-            <span class="badge">۳ تاخیر</span>
+        <div class="sortable-tile" draggable="true" style="background-color: var(--color-lab)">
             <span class="module-icon">🦷</span>
-            <div style="font-size:14px; font-weight:bold;">لابراتوار</div>
-            <small style="font-size:10px; opacity:0.6;">ناژداکی / هژبری</small>
+            <div class="module-title">لابراتوار</div>
+            <div class="module-small">ناژداکی / هژبری</div>
         </div>
 
-        <div class="module-card">
+        <div class="sortable-tile" draggable="true" style="background-color: var(--color-inventory)">
             <span class="module-icon">📦</span>
-            <div style="font-size:14px; font-weight:bold;">انبارگردانی</div>
-            <small style="font-size:10px; opacity:0.6;">اسکن بارکد کالا</small>
+            <div class="module-title">انبار هوشمند</div>
+            <div class="module-small">اسکن بارکد کالا</div>
         </div>
 
-        <div class="module-card">
+        <div class="sortable-tile" draggable="true" style="background-color: var(--color-appt)">
             <span class="module-icon">📅</span>
-            <div style="font-size:14px; font-weight:bold;">نوبت‌دهی</div>
-            <small style="font-size:10px; opacity:0.6;">یونیت آبی / زرد</small>
+            <div class="module-title">نوبت‌دهی آنلاین</div>
+            <div class="module-small">یونیت زرد/آبی</div>
         </div>
 
-        <div class="module-card" style="grid-column: span 2;">
+        <div class="sortable-tile" draggable="true" style="background-color: var(--color-patient)">
             <span class="module-icon">🧬</span>
-            <div style="font-size:14px; font-weight:bold;">پرونده سلامت و امضای دیجیتال</div>
-            <small style="font-size:10px; opacity:0.6;">۱۰۰,۰۰۰ رکورد فعال</small>
+            <div class="module-title">پرونده ۳ بعدی</div>
+            <div class="module-small">۱۰۰،۰۰۰ پرونده</div>
+        </div>
+
+        <div class="sortable-tile" draggable="true" style="background-color: var(--color-ai)">
+            <span class="module-icon">🧠</span>
+            <div class="module-title">چت‌بات AI</div>
+            <div class="module-small">گویای فارسی</div>
+        </div>
+
+        <div class="sortable-tile" draggable="true" style="background-color: var(--color-implant)">
+            <span class="module-icon">💎</span>
+            <div class="module-title">مدیریت ایمپلنت</div>
+            <div class="module-small">سود خالص مدیر</div>
+        </div>
+
+        <div class="sortable-tile" draggable="true" style="background-color: var(--color-insurance)">
+            <span class="module-icon">🛡️</span>
+            <div class="module-title">مدیریت بیمه</div>
+            <div class="module-small">قراردادهای دولتی</div>
+        </div>
+
+        <div class="sortable-tile" draggable="true" style="background-color: var(--color-unit)">
+            <span class="module-icon">🛋️</span>
+            <div class="module-title">یونیت‌های مطب</div>
+            <div class="module-small">ثبت یونیت جدید</div>
+        </div>
+
+        <div class="sortable-tile" draggable="true" style="background-color: var(--color-staff)">
+            <span class="module-icon">👨‍⚕️</span>
+            <div class="module-title">پرسنل</div>
+            <div class="module-small">اکرم عیدی / مینا</div>
+        </div>
+
+        <div class="sortable-tile" draggable="true" style="background-color: var(--color-reports)">
+            <span class="module-icon">📊</span>
+            <div class="module-title">گزارشات آماری</div>
+            <div class="module-small">درآمد خالص</div>
+        </div>
+
+        <div class="sortable-tile" draggable="true" style="background-color: var(--color-settings)">
+            <span class="module-icon">⚙️</span>
+            <div class="module-title">تنظیمات</div>
+            <div class="module-small">امنیتی FaceID</div>
         </div>
     </div>
 
-    <div style="padding:0 20px 150px;">
-        <h4 style="color:var(--teal)">وضعیت کارهای لابراتوار</h4>
-        <div class="lab-item">
-            <div><b>ناژداکی (ثابت)</b><br><small>بیمار: احمدی - روکش</small></div>
-            <div class="price-orange">⏳ ۲ روز تاخیر</div>
-        </div>
-        <div class="lab-item">
-            <div><b>هژبری (متحرک)</b><br><small>بیمار: علوی - پروتز</small></div>
-            <div class="price-green">✅ آماده تحویل</div>
+    <div class="overlay" id="financeOverlay">
+        <div class="popup">
+            <h3 style="color:var(--primary); margin-bottom:20px">مدیریت سهم جراحی و ایمپلنت</h3>
+            <div class="form-group">
+                <label>نوع جراحی:</label>
+                <select class="form-input">
+                    <option>ایمپلنت (فرمول دکتر مهدی)</option>
+                    <option>خدمات عمومی (۵۰/۵۰)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>سهم شما (مدیر):</label>
+                <input type="text" value="LOCKED (100% Fixture)" class="form-input" disabled>
+            </div>
+            <button class="btn" onclick="hideFinance()">بستن و ثبت</button>
         </div>
     </div>
 
-    <nav class="dock">
-        <div class="dock-item active">🏠<br>خانه</div>
-        <div class="dock-item">📊<br>گزارش</div>
-        <div class="dock-item">💬<br>هوش مصنوعی</div>
-        <div class="dock-item">⚙️<br>تنظیمات</div>
+    <nav class="dock-bar">
+        <div class="dock-btn active">🏠<br>داشبورد</div>
+        <div class="dock-btn">📈<br>عملکرد</div>
+        <div class="dock-btn">👨‍💻<br>پرسنل</div>
+        <div class="dock-btn">📜<br>تنظیمات</div>
     </nav>
 
+    <script>
+        const grid = document.getElementById('sortableGrid');
+        let draggingElement = null;
+
+        // افزودن رویدادها به هر کاشی
+        const tiles = grid.querySelectorAll('.sortable-tile');
+        tiles.forEach(tile => {
+            tile.addEventListener('dragstart', (e) => {
+                draggingElement = tile;
+                setTimeout(() => tile.classList.add('dragging'), 0);
+            });
+
+            tile.addEventListener('dragend', () => {
+                draggingElement = null;
+                tile.classList.remove('dragging');
+            });
+        });
+
+        // مدیریت رویداد در زمان کشیدن روی گرید
+        grid.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            const afterElement = getDragAfterElement(grid, e.clientY);
+            if (draggingElement) {
+                if (afterElement == null) {
+                    grid.appendChild(draggingElement);
+                } else {
+                    grid.insertBefore(draggingElement, afterElement);
+                }
+            }
+        });
+
+        // پیدا کردن کاشی بعد از نقطه موس/انگشت
+        function getDragAfterElement(container, y) {
+            const draggableElements = [...container.querySelectorAll('.sortable-tile:not(.dragging)')];
+
+            return draggableElements.reduce((closest, child) => {
+                const box = child.getBoundingClientRect();
+                const offset = y - box.top - box.height / 2;
+                if (offset < 0 && offset > closest.offset) {
+                    return { offset: offset, element: child };
+                } else {
+                    return closest;
+                }
+            }, { offset: Number.NEGATIVE_INFINITY }).element;
+        }
+
+        // عملکرد پاپ‌آپ مالی
+        function showFinance() { document.getElementById('financeOverlay').style.display = 'flex'; }
+        function hideFinance() { document.getElementById('financeOverlay').style.display = 'none'; }
+    </script>
 </body>
 </html>
