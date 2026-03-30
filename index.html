@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>MinaDent Ultra 2026</title>
+    <style>
+        :root { --teal: #008080; --bg: #09090b; --card: #1c1c1e; --red: #ff453a; --green: #32d74b; --orange: #ff9f0a; }
+        body { margin: 0; background: var(--bg); color: white; font-family: -apple-system, sans-serif; overflow: hidden; height: 100vh; }
+        .header { padding: 60px 20px 20px; background: linear-gradient(180deg, rgba(0,128,128,0.2) 0%, transparent 100%); display: flex; justify-content: space-between; }
+        .app-rail { display: flex; width: 400vw; height: calc(100vh - 180px); transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); }
+        .page { width: 100vw; overflow-y: auto; padding: 15px; box-sizing: border-box; }
+        .card { background: var(--card); border-radius: 25px; padding: 20px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.1); }
+        .badge { display: inline-block; padding: 4px 10px; border-radius: 8px; font-size: 11px; font-weight: bold; margin-bottom: 8px; }
+        .badge-debt { background: rgba(255,69,58,0.2); color: var(--red); }
+        .badge-paid { background: rgba(50,215,75,0.2); color: var(--green); }
+        .badge-pending { background: rgba(255,159,10,0.2); color: var(--orange); }
+        .dock { position: fixed; bottom: 30px; left: 20px; right: 20px; height: 75px; background: rgba(255,255,255,0.1); backdrop-filter: blur(30px); border-radius: 30px; display: flex; justify-content: space-around; align-items: center; border: 1px solid rgba(255,255,255,0.1); }
+        .dock-item { opacity: 0.5; text-align: center; font-size: 10px; }
+        .dock-item.active { opacity: 1; color: var(--teal); transform: translateY(-5px); }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div><small style="opacity:0.6">مدیریت عالی</small><div style="font-size:20px; font-weight:bold">دکتر مهدی</div></div>
+        <div style="width:45px; height:45px; background:var(--teal); border-radius:12px; display:flex; align-items:center; justify-content:center; animation: pulse 2s infinite">💎</div>
+    </div>
+    <div class="app-rail" id="rail">
+        <section class="page"> <h3 style="color:var(--teal)">وضعیت آنی مالی</h3>
+            <div class="card">
+                <span class="badge badge-debt">مانده بدهی (قرمز)</span>
+                <div style="font-size:18px">بیمار: مریم احمدی</div>
+                <div style="font-size:13px; opacity:0.7">مبلغ مانده: ۱۲,۰۰۰,۰۰۰ ت</div>
+            </div>
+            <div class="card">
+                <span class="badge badge-paid">تسویه (سبز)</span>
+                <div style="font-size:18px">بیمار: رضا شاکری</div>
+            </div>
+            <div class="card">
+                <span class="badge badge-pending">موعد نرسیده (زرد/نارنجی)</span>
+                <div style="font-size:18px">بیمار: علی علوی</div>
+            </div>
+        </section>
+        <section class="page"><h3>جراحی و ایمپلنت</h3><div class="card"><p>فرمول: ۱۰۰٪ فیکسچر/اباتمنت برای مدیر</p></div></section>
+        <section class="page"><h3>نوبت‌دهی اکرم</h3></section>
+        <section class="page"><h3>هوش مصنوعی</h3></section>
+    </div>
+    <nav class="dock">
+        <div class="dock-item active" onclick="go(0,this)">💰<br>مالی</div>
+        <div class="dock-item" onclick="go(1,this)">🦷<br>جراحی</div>
+        <div class="dock-item" onclick="go(2,this)">📅<br>نوبت</div>
+        <div class="dock-item" onclick="go(3,this)">🧠<br>هوش</div>
+    </nav>
+    <script>
+        function go(i,el){
+            document.getElementById('rail').style.transform=`translateX(${i*100}vw)`;
+            document.querySelectorAll('.dock-item').forEach(d=>d.classList.remove('active'));
+            el.classList.add('active');
+        }
+    </script>
+</body>
+</html>
