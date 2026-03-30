@@ -4,125 +4,224 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>MinaDent Ultra 2026</title>
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
     <style>
-        :root { --teal: #008080; --bg: #09090b; --red: #ff453a; --green: #32d74b; --orange: #ff9f0a; --glass: rgba(255,255,255,0.05); }
-        body { margin: 0; background: var(--bg); color: white; font-family: -apple-system, sans-serif; overflow: hidden; height: 100vh; }
-        .header { padding: 55px 20px 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--glass); }
-        .app-rail { display: flex; width: 400vw; height: calc(100vh - 170px); transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1); }
-        .page { width: 100vw; overflow-y: auto; padding: 20px; box-sizing: border-box; padding-bottom: 140px; }
+        :root {
+            --primary: #008080; /* کله‌غازی مدیریت */
+            --bg: #050505;
+            --card: rgba(25, 25, 25, 0.9);
+            --red: #ff3b30;    /* بدهکار */
+            --green: #34c759;  /* پرداختی */
+            --orange: #ff9500; /* موعد نرسیده */
+            --text: #ffffff;
+        }
+
+        body { 
+            margin: 0; background: var(--bg); color: var(--text); 
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+            overflow: hidden; height: 100vh; -webkit-user-select: none;
+        }
+
+        /* هدر فوق پیشرفته */
+        .header {
+            padding: 60px 20px 20px;
+            background: linear-gradient(180deg, rgba(0,128,128,0.15) 0%, transparent 100%);
+            display: flex; justify-content: space-between; align-items: center;
+        }
+
+        .app-rail { display: flex; width: 500vw; height: calc(100vh - 180px); transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1); }
+        .page { width: 100vw; overflow-y: auto; padding: 20px; box-sizing: border-box; padding-bottom: 120px; }
+
+        /* کارت‌های مالی داینامیک */
+        .card { 
+            background: var(--card); border-radius: 24px; padding: 20px; margin-bottom: 15px; 
+            border: 1px solid rgba(255,255,255,0.08); backdrop-filter: blur(20px);
+        }
         
-        .card { background: var(--glass); border-radius: 24px; padding: 20px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(10px); }
-        .amt-red { color: var(--red); font-weight: bold; font-size: 24px; }
-        .amt-green { color: var(--green); font-weight: bold; font-size: 24px; }
-        .amt-orange { color: var(--orange); font-weight: bold; font-size: 24px; }
+        .status-debt { border-right: 5px solid var(--red); color: var(--red); }
+        .status-debt .amt { color: var(--red); font-size: 24px; font-weight: 900; }
+        
+        .status-paid { border-right: 5px solid var(--green); color: var(--green); }
+        .status-paid .amt { color: var(--green); font-size: 24px; font-weight: 900; }
+        
+        .status-pending { border-right: 5px solid var(--orange); color: var(--orange); }
+        .status-pending .amt { color: var(--orange); font-size: 24px; font-weight: 900; }
 
-        /* پد امضای دیجیتال */
-        #sig-canvas { background: white; border-radius: 15px; touch-action: none; cursor: crosshair; width: 100%; height: 150px; }
-        .btn-main { background: var(--teal); color: white; border: none; padding: 16px; border-radius: 18px; width: 100%; font-weight: bold; margin-top: 10px; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 8px 20px rgba(0,128,128,0.3); }
+        /* فیلدهای ورودی هوشمند */
+        .input-group { margin-bottom: 15px; }
+        .input-group label { display: block; font-size: 12px; opacity: 0.6; margin-bottom: 5px; }
+        input, select, textarea { 
+            width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); 
+            color: white; padding: 14px; border-radius: 15px; box-sizing: border-box; font-size: 15px;
+        }
 
-        .dock { position: fixed; bottom: 25px; left: 20px; right: 20px; height: 75px; background: rgba(255,255,255,0.08); backdrop-filter: blur(30px); border-radius: 30px; display: flex; justify-content: space-around; align-items: center; border: 1px solid rgba(255,255,255,0.1); z-index: 1000; }
+        /* دکمه‌های اکشن */
+        .btn { 
+            background: var(--primary); color: white; border: none; padding: 16px; 
+            border-radius: 18px; width: 100%; font-weight: bold; font-size: 16px;
+            box-shadow: 0 10px 20px rgba(0,128,128,0.2); transition: 0.3s;
+        }
+        .btn:active { transform: scale(0.97); opacity: 0.8; }
+
+        /* داک پایین نئون */
+        .dock { 
+            position: fixed; bottom: 30px; left: 20px; right: 20px; height: 75px; 
+            background: rgba(30, 30, 30, 0.7); backdrop-filter: blur(30px); border-radius: 30px; 
+            display: flex; justify-content: space-around; align-items: center; border: 1px solid rgba(255,255,255,0.1);
+        }
         .dock-item { opacity: 0.4; text-align: center; font-size: 10px; transition: 0.3s; }
-        .dock-item.active { opacity: 1; color: var(--teal); transform: scale(1.1); }
-        
-        input, select { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; padding: 12px; border-radius: 12px; width: 100%; box-sizing: border-box; margin-top: 5px; }
+        .dock-item.active { opacity: 1; color: var(--primary); transform: translateY(-5px); }
+        .dock-icon { font-size: 22px; display: block; margin-bottom: 2px; }
+
+        /* بوم امضا */
+        #sig-pad { background: #fff; border-radius: 15px; width: 100%; height: 160px; touch-action: none; }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <div><small style="opacity:0.5">Ultra Performance 2026</small><div style="font-size:22px; font-weight:bold">دکتر مهدی</div></div>
-        <div style="width:45px; height:45px; background:var(--teal); border-radius:15px; display:flex; align-items:center; justify-content:center;">💎</div>
+        <div><small style="opacity:0.5">Ultra Core v2026</small><div style="font-size:22px; font-weight:900; letter-spacing:-1px;">دکتر مهدی</div></div>
+        <div style="background:var(--primary); padding:10px; border-radius:12px; box-shadow: 0 0 15px var(--primary)">💎</div>
     </div>
 
-    <div class="app-rail" id="mainRail">
+    <div class="app-rail" id="rail">
         
         <section class="page">
-            <h3 style="color:var(--teal)">امور مالی و اسکن</h3>
-            <div class="card">
-                <div style="margin-bottom:5px;">بیمار: مریم احمدی</div>
-                <div class="amt-red">۱۲,۵۰۰,۰۰۰ تومان</div>
-                <button class="btn-main" style="margin-top:15px; background:#222; font-size:12px;" onclick="sendSMS('مریم احمدی', '۱۲,۵۰۰,۰۰۰')">✉️ ارسال پیامک بدهی</button>
-            </div>
+            <h3 style="color:var(--primary)">گزارش آنی مانده حساب</h3>
             
-            <button class="btn-main" onclick="document.getElementById('file-input').click()">📸 اسکن فیش (OCR)</button>
-            <input type="file" id="file-input" accept="image/*" capture="environment" style="display:none" onchange="startOCR(event)">
-        </section>
-
-        <section class="page">
-            <h3 style="color:var(--teal)">پرونده و امضای دیجیتال</h3>
-            <div class="card">
-                <p style="font-size:13px; margin-bottom:10px;">بیمار گرامی، لطفاً رضایت‌نامه را در کادر زیر امضا کنید:</p>
-                <canvas id="sig-canvas"></canvas>
-                <button class="btn-main" onclick="saveSignature()">💾 ثبت امضا در پرونده</button>
-                <button class="btn-main" style="background:none; color:var(--red); border:1px solid var(--red);" onclick="clearSignature()">پاک کردن</button>
+            <div class="card status-debt">
+                <small>بیمار: مریم احمدی (بدهکار)</small>
+                <div class="amt">۱۲,۸۰۰,۰۰۰ تومان</div>
+                <div style="font-size:11px; margin-top:5px;">آخرین واریزی: ۳ روز پیش به حساب سپه</div>
             </div>
-        </section>
 
-        <section class="page">
-            <h3 style="color:var(--teal)">پنل اکرم عیدی</h3>
-            <div class="card">
-                <label>نام و فامیل بیمار:</label>
-                <input type="text" id="pName" placeholder="مثلاً: اکرم عیدی">
-                <label style="margin-top:10px; display:block;">شماره موبایل:</label>
-                <input type="tel" id="pTel" placeholder="0912xxxxxxx">
-                <button class="btn-main" onclick="setAppointment()">📅 ثبت نوبت و پیامک تایید</button>
+            <div class="card status-pending">
+                <small>بیمار: رضا شاکری (موعد نرسیده)</small>
+                <div class="amt">۵,۰۰۰,۰۰۰ تومان</div>
+                <div style="font-size:11px; margin-top:5px;">سررسید چک: ۱۵ فروردین ۱۴۰۵</div>
             </div>
+
+            <div class="card status-paid">
+                <small>بیمار: علی علوی (تسویه کامل)</small>
+                <div class="amt">۴۲,۰۰۰,۰۰۰ تومان</div>
+                <div style="font-size:11px; margin-top:5px;">وضعیت: خوش‌حساب ✅</div>
+            </div>
+
+            <button class="btn" onclick="document.getElementById('file-in').click()">📸 اسکن فیش و استخراج متن</button>
+            <input type="file" id="file-in" accept="image/*" capture="environment" style="display:none" onchange="ocrProcess(event)">
+            <div id="ocr-log" style="font-size:10px; color:var(--green); margin-top:10px; text-align:center;"></div>
         </section>
 
         <section class="page">
-            <h3 style="color:var(--teal)">تنظیمات پیامک مدیریت</h3>
+            <h3 style="color:var(--primary)">پنل جراحی - دکتر مینا</h3>
             <div class="card">
-                <p style="font-size:12px;">وضعیت: متصل به پنل مرکزی ✅</p>
-                <label>متن پیش‌فرض (بدون نام پزشک):</label>
-                <div style="font-size:11px; background:rgba(0,0,0,0.3); padding:10px; border-radius:10px; margin-top:5px; line-height:1.6;">
-                    بیمار محترم، نوبت شما برای تاریخ [DATE] در کلینیک ثبت شد.
-                    <br>مبلغ پرداختی: [AMOUNT] تومان.
+                <div class="input-group">
+                    <label>هزینه کل جراحی (تومان):</label>
+                    <input type="number" id="total" value="25000000">
                 </div>
-                <p style="font-size:11px; color:var(--orange); margin-top:10px;">⚠️ نام پزشک طبق دستور مدیر در پیامک درج نمی‌شود.</p>
+                <div class="input-group">
+                    <label>هزینه قطعات (فیکسچر/اباتمنت) - سهم مدیر:</label>
+                    <input type="number" id="fixture" value="9000000">
+                </div>
+                <button class="btn" onclick="calculateSplit()">📊 محاسبه نهایی سهم‌بندی</button>
+                <div id="split-res" style="margin-top:15px; display:none;">
+                    <div style="color:var(--green)">سهم دکتر مهدی: <span id="mgr">0</span></div>
+                    <div style="color:white; opacity:0.7">سهم جراح (مینا): <span id="dr">0</span></div>
+                </div>
+            </div>
+        </section>
+
+        <section class="page">
+            <h3 style="color:var(--primary)">پذیرش هوشمند (اکرم عیدی)</h3>
+            <div class="card">
+                <div style="background:rgba(0,128,128,0.1); padding:10px; border-radius:10px; margin-bottom:15px; font-size:12px; text-align:center;">
+                    نوبت‌دهی اولیه: فقط نام و موبایل | پرونده دائمی: فول دیتا
+                </div>
+                <input type="text" placeholder="نام و نام خانوادگی بیمار" style="margin-bottom:10px;">
+                <input type="tel" placeholder="شماره موبایل">
+                <div id="full-data" style="display:none; margin-top:10px;">
+                    <input type="number" placeholder="کد ملی (الزامی)" style="margin-bottom:10px;">
+                    <input type="text" placeholder="شماره پرونده اختصاصی">
+                </div>
+                <button class="btn" style="margin-top:15px;" onclick="document.getElementById('full-data').style.display='block'">➕ تکمیل پرونده و ثبت کد ملی</button>
+            </div>
+        </section>
+
+        <section class="page">
+            <h3 style="color:var(--primary)">تاییدیه و امضای دیجیتال</h3>
+            <div class="card">
+                <p style="font-size:12px; opacity:0.7">بیمار محترم، امضای شما به صورت دیجیتال در پرونده ۱۰۰،۰۰۰ تایی کلینیک ذخیره می‌شود.</p>
+                <canvas id="sig-pad"></canvas>
+                <div style="display:flex; gap:10px; margin-top:15px;">
+                    <button class="btn" style="background:#444" onclick="clearSig()">پاک کردن</button>
+                    <button class="btn" onclick="saveSig()">✅ تایید و قفل امضا</button>
+                </div>
+            </div>
+        </section>
+
+        <section class="page">
+            <h3 style="color:var(--primary)">مدیریت واریزی‌ها</h3>
+            <div class="card">
+                <label>واریز به حساب:</label>
+                <select>
+                    <option>بانک سپه - دکتر مهدی</option>
+                    <option>بانک ملی - کلینیک</option>
+                    <option>کارت‌خوان شماره ۱</option>
+                </select>
+                <hr style="opacity:0.1; margin:15px 0;">
+                <p style="font-size:11px;">⚠️ نام پزشک در پیامک خروجی درج نمی‌شود (تنظیمات مدیر).</p>
             </div>
         </section>
     </div>
 
     <nav class="dock">
-        <div class="dock-item active" onclick="move(0,this)">💰<br>مالی</div>
-        <div class="dock-item" onclick="move(1,this)">✍️<br>امضا</div>
-        <div class="dock-item" onclick="move(2,this)">📅<br>نوبت</div>
-        <div class="dock-item" onclick="move(3,this)">⚙️<br>پیامک</div>
+        <div class="dock-item active" onclick="nav(0,this)"><span class="dock-icon">💰</span>مالی</div>
+        <div class="dock-item" onclick="nav(1,this)"><span class="dock-icon">🦷</span>جراحی</div>
+        <div class="dock-item" onclick="nav(2,this)"><span class="dock-icon">👤</span>پذیرش</div>
+        <div class="dock-item" onclick="nav(3,this)"><span class="dock-icon">✍️</span>امضا</div>
+        <div class="dock-item" onclick="nav(4,this)"><span class="dock-icon">⚙️</span>تنظیمات</div>
     </nav>
 
     <script>
-        // تنظیمات بوم امضا
-        const canvas = document.getElementById('sig-canvas');
-        const ctx = canvas.getContext('2d');
-        let drawing = false;
-
-        function getPos(e) {
-            const rect = canvas.getBoundingClientRect();
-            return { x: (e.touches ? e.touches[0].clientX : e.clientX) - rect.left, 
-                     y: (e.touches ? e.touches[0].clientY : e.clientY) - rect.top };
-        }
-
-        canvas.addEventListener('mousedown', (e) => { drawing = true; ctx.beginPath(); const p = getPos(e); ctx.moveTo(p.x, p.y); });
-        canvas.addEventListener('mousemove', (e) => { if(!drawing) return; const p = getPos(e); ctx.lineTo(p.x, p.y); ctx.stroke(); });
-        canvas.addEventListener('mouseup', () => drawing = false);
-        canvas.addEventListener('touchstart', (e) => { drawing = true; ctx.beginPath(); const p = getPos(e); ctx.moveTo(p.x, p.y); e.preventDefault(); });
-        canvas.addEventListener('touchmove', (e) => { if(!drawing) return; const p = getPos(e); ctx.lineTo(p.x, p.y); ctx.stroke(); e.preventDefault(); });
-
-        ctx.lineWidth = 2; ctx.strokeStyle = "#000";
-
-        function clearSignature() { ctx.clearRect(0, 0, canvas.width, canvas.height); }
-        function saveSignature() { alert("امضای بیمار با موفقیت اسکن و در سرور گیت‌هاب ذخیره شد."); }
-
-        function sendSMS(name, amount) { alert(`پیامک به ${name} ارسال شد:\n مبلغ ${amount} تومان دریافت شد.\n(بدون ذکر نام پزشک)`); }
-        function setAppointment() { const n = document.getElementById('pName').value; alert(`نوبت برای ${n} ثبت و پیامک تایید ارسال شد.`); }
-
-        function move(i, el) {
-            document.getElementById('mainRail').style.transform = `translateX(${i * -100}vw)`;
+        // موتور حرکت بین صفحات
+        function nav(i, el) {
+            document.getElementById('rail').style.transform = `translateX(${i * -100}vw)`;
             document.querySelectorAll('.dock-item').forEach(d => d.classList.remove('active'));
             el.classList.add('active');
         }
+
+        // محاسبات جراحی (قفل شده)
+        function calculateSplit() {
+            const t = parseInt(document.getElementById('total').value);
+            const f = parseInt(document.getElementById('fixture').value);
+            const netSurgery = t - f;
+            document.getElementById('mgr').innerText = (f + (netSurgery / 2)).toLocaleString() + " تومان";
+            document.getElementById('dr').innerText = (netSurgery / 2).toLocaleString() + " تومان";
+            document.getElementById('split-res').style.display = 'block';
+        }
+
+        // اسکنر OCR (هوشمند)
+        async function ocrProcess(e) {
+            const log = document.getElementById('ocr-log');
+            log.innerText = "⏳ در حال خواندن متن فیش با هوش مصنوعی...";
+            const file = e.target.files[0];
+            const { data: { text } } = await Tesseract.recognize(file, 'eng+fas');
+            log.innerText = "✅ اسکن شد: " + text.substring(0, 50) + "...";
+            alert("اطلاعات فیش/پیامک استخراج و در حساب واریزی ذخیره شد.");
+        }
+
+        // امضای لمسی
+        const canvas = document.getElementById('sig-pad');
+        const ctx = canvas.getContext('2d');
+        let drawing = false;
+        canvas.addEventListener('touchstart', (e) => { drawing = true; ctx.beginPath(); const rect = canvas.getBoundingClientRect(); ctx.moveTo(e.touches[0].clientX - rect.left, e.touches[0].clientY - rect.top); e.preventDefault(); });
+        canvas.addEventListener('touchmove', (e) => { if(!drawing) return; const rect = canvas.getBoundingClientRect(); ctx.lineTo(e.touches[0].clientX - rect.left, e.touches[0].clientY - rect.top); ctx.stroke(); e.preventDefault(); });
+        canvas.addEventListener('touchend', () => drawing = false);
+        ctx.lineWidth = 2; ctx.strokeStyle = "#000";
+        function clearSig() { ctx.clearRect(0,0,canvas.width,canvas.height); }
+        function saveSig() { alert("امضای دیجیتال بیمار در پرونده قفل شد."); }
     </script>
 </body>
 </html>
