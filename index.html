@@ -1,71 +1,119 @@
-<div id="bookingPage" style="background: white; position: fixed; inset: 0; z-index: 9000; display: flex; flex-direction: column;">
+<div id="bookingFullPage" class="ios26-container">
     
-    <div style="padding: 50px 20px 20px; background: #F9F9F9; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #EEE;">
-        <span style="font-size: 24px; cursor: pointer;" onclick="closeBooking()">✕</span>
-        <div style="text-align: right;">
-            <div style="font-weight: 900; font-size: 18px;">نوبت‌دهی فول‌اسکرین</div>
-            <div style="font-size: 11px; color: var(--teal-master);">استاندارد ۲۰۲۶ • مدیریت نوبت‌ها</div>
+    <header class="glass-header">
+        <div class="close-icon" onclick="backToHome()">✕</div>
+        <div class="header-text">
+            <h1>نوبت‌دهی و پذیرش</h1>
+            <p>استاندارد جهانی ۲۰۲۶ • نسخه فوق پیشرفته</p>
         </div>
-    </div>
+    </header>
 
-    <div style="padding: 20px; overflow-y: auto; flex: 1;">
-        
-        <div class="input-block">
-            <label>نام و نام خانوادگی بیمار *</label>
-            <input type="text" id="pName" placeholder="مثلاً: محمد حسینی" class="v9-input">
-        </div>
-
-        <div class="input-block">
-            <label>شماره موبایل (جهت پیامک) *</label>
-            <input type="tel" id="pCell" placeholder="09120000000" class="v9-input" dir="ltr">
-        </div>
-
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-            <div class="input-block">
-                <label>تعیین وقت (تاریخ)</label>
-                <input type="date" class="v9-input">
+    <div class="form-scroll">
+        <section class="input-section">
+            <div class="field-box">
+                <label>نام و نام خانوادگی بیمار</label>
+                <input type="text" placeholder="مثلاً: دکتر مهدی" class="ios-input">
             </div>
-            <div class="input-block">
-                <label>ساعت</label>
-                <input type="time" class="v9-input">
+            <div class="field-box">
+                <label>شماره موبایل (الزامی)</label>
+                <input type="tel" placeholder="0912xxxxxxx" class="ios-input ltr-input">
             </div>
-        </div>
+        </section>
 
-        <div class="input-block">
-            <label>توسط کادر:</label>
-            <select class="v9-input">
-                <option>دکتر مهدی (مدیر)</option>
-                <option>دکتر مینا مازندرانی</option>
-                <option>اکرم عیدی (منشی)</option>
-            </select>
-        </div>
+        <section class="calendar-section">
+            <h3 style="margin-right: 15px; font-size: 14px;">انتخاب روز (تقویم شمسی ایران)</h3>
+            <div class="shamsi-grid" id="shamsiCalendar">
+                </div>
+        </section>
 
-        <div style="margin-top: 30px;">
-            <button class="v9-submit-btn" onclick="saveBooking()">ثبت نوبت و ارسال پیامک تایید</button>
-            <button class="v9-online-btn">فعال‌سازی نوبت‌دهی آنلاین</button>
+        <section class="input-section">
+            <div class="field-box">
+                <label>توسط کادر درمانی</label>
+                <select class="ios-select">
+                    <option>دکتر مهدی (مدیر)</option>
+                    <option>دکتر مینا مازندرانی</option>
+                    <option>اکرم عیدی (منشی)</option>
+                </select>
+            </div>
+            <div class="field-box">
+                <label>ساعت حضور</label>
+                <input type="time" class="ios-input">
+            </div>
+        </section>
+
+        <div class="action-area">
+            <button class="main-btn-orange">ثبت نوبت و ارسال پیامک هوشمند</button>
+            <p class="sms-hint">پیامک تایید بدون نام پزشک ارسال خواهد شد.</p>
         </div>
     </div>
 </div>
 
 <style>
-    .v9-input {
-        width: 100%; background: #F2F2F7; border: 2px solid transparent; border-radius: 18px;
-        padding: 18px; font-size: 16px; margin-top: 8px; box-sizing: border-box; outline: none;
-        transition: 0.3s;
+    :root {
+        --ios-teal: #008080;
+        --ios-orange: linear-gradient(135deg, #FF9500, #FF5E3A);
+        --ios-holiday: #FF3B30; /* قرمز استاندارد تعطیلی */
+        --ios-bg: #F2F2F7;
     }
-    .v9-input:focus { border-color: var(--teal-master); background: white; }
-    .input-block { margin-bottom: 20px; text-align: right; }
-    .input-block label { font-weight: bold; font-size: 14px; color: #444; margin-right: 8px; }
 
-    .v9-submit-btn {
-        width: 100%; background: linear-gradient(135deg, #FF9500, #FF5E3A);
-        color: white; border: none; border-radius: 20px; padding: 20px;
-        font-weight: 900; font-size: 18px; box-shadow: 0 10px 25px rgba(255,94,58,0.3);
-        cursor: pointer;
+    .ios26-container {
+        position: fixed; inset: 0; background: var(--ios-bg);
+        z-index: 10000; display: flex; flex-direction: column;
+        font-family: "IRANSansX", "Tahoma", sans-serif; direction: rtl;
     }
-    .v9-online-btn {
-        width: 100%; background: white; color: var(--teal-master);
-        border: 2px solid var(--teal-master); border-radius: 20px; padding: 15px;
-        font-weight: bold; margin-top: 15px; cursor: pointer;
+
+    .glass-header {
+        padding: 50px 20px 20px; background: rgba(255,255,255,0.7);
+        backdrop-filter: blur(25px); display: flex; align-items: center;
+        border-bottom: 0.5px solid rgba(0,0,0,0.1);
     }
+
+    .header-text h1 { font-size: 20px; font-weight: 900; margin: 0; }
+    .header-text p { font-size: 11px; color: var(--ios-teal); margin: 0; }
+    .close-icon { font-size: 24px; margin-left: 20px; cursor: pointer; }
+
+    .form-scroll { padding: 20px; overflow-y: auto; flex: 1; }
+
+    .field-box { margin-bottom: 20px; }
+    .field-box label { display: block; font-size: 13px; font-weight: 700; color: #3A3A3C; margin-bottom: 8px; margin-right: 5px; }
+
+    .ios-input, .ios-select {
+        width: 100%; border: none; background: white; border-radius: 18px;
+        padding: 18px; font-size: 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+        box-sizing: border-box; outline: none; transition: 0.3s;
+    }
+    .ios-input:focus { box-shadow: 0 0 0 3px rgba(0,128,128,0.2); }
+    .ltr-input { direction: ltr; text-align: left; }
+
+    /* استایل تقویم شمسی */
+    .shamsi-grid {
+        display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px;
+        background: white; padding: 15px; border-radius: 22px; margin-top: 10px;
+    }
+    .day-cell {
+        aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
+        font-size: 14px; font-weight: bold; border-radius: 12px; cursor: pointer;
+    }
+    .holiday { color: var(--ios-holiday); } /* تعطیلات قرمز */
+    .today { background: var(--ios-teal); color: white; }
+
+    .main-btn-orange {
+        width: 100%; background: var(--ios-orange); color: white;
+        border: none; border-radius: 22px; padding: 22px;
+        font-weight: 900; font-size: 18px; cursor: pointer;
+        box-shadow: 0 12px 30px rgba(255,94,58,0.3);
+    }
+    .sms-hint { text-align: center; font-size: 10px; color: #8E8E93; margin-top: 12px; }
 </style>
+
+<script>
+    // شبیه‌ساز تقویم شمسی برای نمایش در دمو
+    const calendar = document.getElementById('shamsiCalendar');
+    for(let i=1; i<=31; i++) {
+        let day = document.createElement('div');
+        day.className = 'day-cell' + (i % 7 === 5 ? ' holiday' : ''); // جمعه‌ها قرمز
+        day.innerText = i;
+        if(i === 15) day.classList.add('today'); // نمایش روز جاری
+        calendar.appendChild(day);
+    }
+</script>
