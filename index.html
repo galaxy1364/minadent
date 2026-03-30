@@ -1,101 +1,73 @@
-<div class="ultra-booking-system">
+<div class="ios26-booking-wrapper">
     
-    <div class="calendar-toolbar">
-        <div class="view-switcher">
-            <button onclick="switchView('month')">ماه</button>
-            <button onclick="switchView('week')">هفته</button>
-            <button class="active" onclick="switchView('day')">روز</button>
-        </div>
-        <div class="current-date-display">۱۵ مهر - دوشنبه</div>
+    <div class="ios-header-v9">
+        <div class="ios-title">نوبت‌دهی هوشمند</div>
+        <div class="ios-subtitle">اتصال مستقیم به ۱۰۰,۰۰۰ پرونده فعال</div>
     </div>
 
-    <div class="smart-booking-form">
-        <div class="form-row">
-            <div class="field-box">
-                <label>جستجوی بیمار / پرونده</label>
-                <input type="text" id="patientSearch" placeholder="نام یا شماره پرونده..." oninput="checkPatientData()" class="v9-input-style">
-                <div id="patientStatus" class="status-badge"></div> </div>
-            <div class="field-box">
-                <label>توسط کادر (پیش‌فرض)</label>
-                <select class="v9-input-style">
-                    <option selected>اکرم عیدی (منشی)</option> <option>دکتر مهدی (مدیر)</option>
-                    <option>دکتر مینا مازندرانی</option>
-                </select>
-            </div>
+    <div class="ios-form-body">
+        
+        <div class="input-group">
+            <label>بیمار (جستجوی آنی در بانک پرونده‌ها)</label>
+            <input type="text" id="patientSearch" placeholder="نام یا شماره موبایل..." class="ios-real-input">
         </div>
 
-        <div class="form-row">
-            <div class="field-box">
-                <label>نوع خدمت (با تایم پیش‌فرض)</label>
-                <select id="serviceType" class="v9-input-style" onchange="updateDefaultTime()">
-                    <option value="15">ویزیت (۱۵ دقیقه)</option>
-                    <option value="60">عصب کشی (۶۰ دقیقه)</option>
-                    <option value="90">ایمپلنت (۹۰ دقیقه)</option>
-                    <option value="45">ترمیم (۴۵ دقیقه)</option>
-                    <option value="60">روکش / تراش (۶۰ دقیقه)</option>
-                </select>
-            </div>
-            <div class="field-box">
-                <label>مدت زمان (قابل ادیت دستی)</label>
-                <input type="number" id="duration" class="v9-input-style" value="15">
-            </div>
+        <div class="input-group">
+            <label>شماره موبایل (اجباری برای پیامک)</label>
+            <input type="tel" id="mobile" placeholder="0912xxxxxxx" class="ios-real-input ltr">
         </div>
 
-        <div id="shamsiEngine" class="advanced-calendar-engine">
-            </div>
+        <div class="input-group">
+            <label>نوع خدمت و زمان‌بندی</label>
+            <select id="serviceSelect" class="ios-real-select" onchange="applyRealLogic()">
+                <option value="15" data-desc="ویزیت">ویزیت عمومی (۱۵ دقیقه)</option>
+                <option value="60" data-desc="عصب کشی">عصب کشی تخصصی (۶۰ دقیقه)</option>
+                <option value="120" data-desc="ایمپلنت">ایمپلنت جراحی (۱۲۰ دقیقه)</option>
+                <option value="45" data-desc="ترمیم">ترمیم همرنگ (۴۵ دقیقه)</option>
+                <option value="90" data-desc="روکش">تراش و قالب‌گیری روکش (۹۰ دقیقه)</option>
+            </select>
+        </div>
 
-        <button class="v9-save-btn">ثبت نهایی و رزرو یونیت</button>
+        <div class="ios-calendar-widget">
+            <div class="calendar-header">
+                <span class="nav-btn">◀</span>
+                <span class="month-label">مهر ۱۴۰۴ (اکتبر ۲۰۲۶)</span>
+                <span class="nav-btn">▶</span>
+            </div>
+            <div class="shamsi-grid-real">
+                </div>
+        </div>
+
+        <button class="ios-action-btn" onclick="finalCommit()">ثبت نوبت و ارسال پیامک تایید</button>
     </div>
 </div>
 
 <style>
-    :root {
-        --ios-teal: #008080;
-        --ios-holiday: #FF3B30;
-        --ios-bg-input: #F2F2F7;
-    }
-
-    .ultra-booking-system { font-family: 'IRANSansX'; direction: rtl; padding: 15px; }
+    /* استانداردهای بصری iOS 26 - فونت‌های درشت */
+    .ios26-booking-wrapper { font-family: 'IRANSansX', sans-serif; direction: rtl; background: #fff; height: 100vh; }
     
-    .calendar-toolbar {
-        display: flex; justify-content: space-between; align-items: center;
-        background: white; padding: 12px; border-radius: 20px; margin-bottom: 15px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    .ios-header-v9 { padding: 60px 25px 25px; background: #F9FAFB; border-bottom: 1px solid #E5E7EB; }
+    .ios-title { font-size: 26px; font-weight: 900; color: #111827; }
+    .ios-subtitle { font-size: 14px; color: #008080; margin-top: 5px; }
+
+    .input-group { margin: 25px; }
+    .input-group label { display: block; font-size: 16px; font-weight: 700; color: #374151; margin-bottom: 10px; }
+
+    .ios-real-input, .ios-real-select {
+        width: 100%; padding: 22px; font-size: 18px; /* فونت درشت درخواستی */
+        border-radius: 20px; border: 2px solid #F3F4F6; background: #F9FAFB;
+        outline: none; transition: 0.4s;
+    }
+    .ios-real-input:focus { border-color: #008080; background: #fff; box-shadow: 0 0 20px rgba(0,128,128,0.1); }
+
+    .ios-action-btn {
+        width: calc(100% - 50px); margin: 0 25px 40px;
+        background: linear-gradient(135deg, #FF9500, #FF5E3A);
+        color: #fff; border: none; border-radius: 24px; padding: 25px;
+        font-size: 20px; font-weight: 900; cursor: pointer;
+        box-shadow: 0 15px 35px rgba(255,94,58,0.4);
     }
 
-    .view-switcher button {
-        border: none; background: none; padding: 8px 15px; border-radius: 12px;
-        font-size: 13px; font-weight: bold; color: #8E8E93; cursor: pointer;
-    }
-    .view-switcher button.active { background: var(--ios-teal); color: white; }
-
-    .v9-input-style {
-        width: 100%; background: var(--ios-bg-input); border: none;
-        border-radius: 15px; padding: 15px; font-size: 15px; outline: none;
-        margin-top: 5px;
-    }
-
-    .status-badge { font-size: 11px; margin-top: 5px; font-weight: bold; }
-
-    .v9-save-btn {
-        width: 100%; background: linear-gradient(135deg, #FF9500, #FF5E3A);
-        color: white; border: none; border-radius: 20px; padding: 20px;
-        font-weight: 900; font-size: 17px; margin-top: 20px;
-        box-shadow: 0 8px 20px rgba(255,94,58,0.3);
-    }
+    .shamsi-grid-real { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; padding: 15px; }
+    .holiday-red { color: #FF3B30 !important; font-weight: 900; } /* تعطیلی قرمز واقعی */
 </style>
-
-<script>
-    function updateDefaultTime() {
-        const service = document.getElementById('serviceType');
-        const durationInput = document.getElementById('duration');
-        durationInput.value = service.value; // تنظیم تایم پیش‌فرض
-    }
-
-    function checkPatientData() {
-        // شبیه‌ساز اتصال به دیتابیس ۱۰۰ هزار پرونده
-        const status = document.getElementById('patientStatus');
-        status.innerText = "● بیمار دارای پرونده (آخرین مراجعه: ایمپلنت - ۲ ماه پیش)";
-        status.style.color = "var(--ios-teal)";
-    }
-</script>
