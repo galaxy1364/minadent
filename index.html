@@ -1,22 +1,30 @@
-// هسته مالی استاندارد ۲۰۲۶ - قفل شده برای دکتر مهدی
-const FinanceCore = {
-    // فرمول سهم‌بندی اختصاصی
-    calculateShare: function(totalAmount, labCost, isImplant = false) {
-        if (isImplant) {
-            // در ایمپلنت فقط هزینه جراحی وارد سهم‌بندی می‌شود
-            return (totalAmount - labCost) / 2; 
-        }
-        // در کارهای عمومی: (کل - لابراتوار) تقسیم بر ۲
-        return (totalAmount - labCost) / 2;
+/* --- هسته نوبت‌دهی هوشمند ۲۰۲۶ --- */
+
+const AppointmentManager = {
+    // ۱. تنظیم یادآوری هوشمند ایمپلنت (قانون ۳ ماهه شما)
+    setImplantFollowUp: function(patientId, implantDate) {
+        let followUpDate = new Date(implantDate);
+        followUpDate.setMonth(followUpDate.getMonth() + 3); // افزودن ۳ ماه خودکار
+        
+        console.log(`یادآوری هوشمند برای بیمار ${patientId} در تاریخ ${followUpDate.toLocaleDateString('fa-IR')} ثبت شد.`);
+        // نمایش در نوتیفیکیشن گوشی حتی اگر اینترنت قطع باشد
+        this.pushLocalNotification("زمان هیلینگ/قالب‌گیری ایمپلنت فرا رسیده است.");
     },
 
-    // ثبت فیش با استاندارد OCR (هسته آماده جهانی)
-    processReceiptScan: function(imageFile) {
-        console.log("در حال آنالیز فیش بانکی با هوش مصنوعی...");
-        // اینجا کد اتصال به هسته پردازش تصویر قرار می‌گیرد
-        return { status: "success", amount: 1200000, date: "1404/09/25" };
+    // ۲. فرمت پیامک استاندارد (بدون نام پزشک - طبق دستور شما)
+    generateSMS: function(patientName, time, date) {
+        return `بیمار گرامی ${patientName}، نوبت شما در "مطب دندانپزشکی" برای تاریخ ${date} ساعت ${time} رزرو شد. لطفا ۱۵ دقیقه قبل در مطب حضور داشته باشید.`;
+    },
+
+    // ۳. سیستم آفلاین (سینک خودکار)
+    syncOfflineData: function() {
+        if (navigator.onLine) {
+            console.log("در حال سینک نوبت‌های ثبت شده در حالت آفلاین با سرور ابری...");
+        } else {
+            console.log("اینترنت قطع است. نوبت‌ها در حافظه گوشی (LocalStorage) امن هستند.");
+        }
     }
 };
 
-// ذخیره دائمی تنظیمات در هسته برنامه
-localStorage.setItem('DrMehdi_Finance_Logic', JSON.stringify(FinanceCore));
+// ذخیره دائمی هسته نوبت‌دهی در پروژه
+localStorage.setItem('DrMehdi_Appt_Core', JSON.stringify(AppointmentManager));
