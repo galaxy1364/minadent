@@ -3,143 +3,141 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>MinaDent Ultra 2026 | Dr. Mehdi</title>
+    <title>MinaDent Ultra 2026 | Global Standard</title>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <style>
         :root {
-            --teal-2026: #008080; /* کله غازی مدرن */
+            --teal-master: #008080; /* کله‌غازی استاندارد */
             --ios-bg: #F2F2F7;
-            --card-bg: #ffffff;
-            --red-debt: #FF3B30;
-            --green-paid: #34C759;
-            --orange-pending: #FF9500;
+            --debt-red: #FF3B30;
+            --paid-green: #34C759;
+            --font-main: -apple-system, BlinkMacSystemFont, "Tahoma", sans-serif;
         }
 
         body { 
-            margin: 0; background: var(--ios-bg); 
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            color: #1C1C1E; -webkit-user-select: none;
+            margin: 0; background: var(--ios-bg); font-family: var(--font-main);
+            color: #1C1C1E; direction: rtl; -webkit-user-select: none;
         }
 
-        /* لوگوی متحرک مشابه دولینگو */
-        .main-logo {
-            width: 70px; height: 70px; background: var(--teal-2026);
-            border-radius: 20px; margin: 50px auto 20px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 35px; color: white;
-            box-shadow: 0 10px 25px rgba(0,128,128,0.3);
-            animation: bounce 2s infinite;
+        /* هدر فوق مدرن */
+        .header {
+            padding: 60px 20px 20px; background: rgba(255,255,255,0.8);
+            backdrop-filter: blur(20px); position: sticky; top: 0; z-index: 1000;
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 0.5px solid rgba(0,0,0,0.1);
         }
-        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
 
-        /* داشبورد و گرید */
-        .grid-container {
+        /* گرید ماژولار ۱۲ بخش */
+        .app-grid {
             display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 20px;
             padding-bottom: 120px;
         }
 
-        .module-card {
-            background: var(--card-bg); border-radius: 28px; padding: 25px 15px;
-            text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-            transition: 0.3s; position: relative; border: 1px solid rgba(0,0,0,0.02);
+        .card {
+            background: #ffffff; border-radius: 30px; padding: 25px 15px;
+            text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); border: 1px solid rgba(0,0,0,0.02);
+            position: relative;
         }
 
-        .icon-box { font-size: 45px; display: block; margin-bottom: 10px; }
-        .module-title { font-weight: 900; font-size: 15px; }
+        .card-icon { font-size: 45px; display: block; margin-bottom: 12px; }
+        .card-title { font-weight: 900; font-size: 15px; }
 
-        /* بخش نمایش مبالغ هوشمند */
-        .finance-badge {
-            font-size: 11px; margin-top: 8px; padding: 4px 10px;
-            border-radius: 12px; display: inline-block; font-weight: bold;
+        /* نشانگر وضعیت مالی (استاندارد ایران) */
+        .status-pill {
+            font-size: 11px; padding: 4px 12px; border-radius: 12px;
+            margin-top: 10px; display: inline-block; font-weight: bold;
         }
 
-        /* داک پایین نئومورفیک */
-        .bottom-dock {
-            position: fixed; bottom: 25px; left: 20px; right: 20px;
-            height: 85px; background: rgba(255,255,255,0.85);
-            backdrop-filter: blur(25px); border-radius: 35px;
+        /* داک پایین iOS 26 */
+        .dock {
+            position: fixed; bottom: 30px; left: 20px; right: 20px;
+            height: 85px; background: rgba(255,255,255,0.9);
+            backdrop-filter: blur(30px); border-radius: 35px;
             display: flex; justify-content: space-around; align-items: center;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.1); z-index: 9999;
-        }
-        
-        .dock-btn { font-size: 28px; transition: 0.2s; }
-        .center-btn { 
-            width: 60px; height: 60px; background: var(--teal-2026); 
-            border-radius: 50%; display: flex; align-items: center; 
-            justify-content: center; color: white; margin-top: -35px;
-            box-shadow: 0 8px 20px rgba(0,128,128,0.4);
+            box-shadow: 0 20px 45px rgba(0,0,0,0.15); z-index: 2000;
         }
 
-        /* حالت ویرایش ۵ ثانیه‌ای */
-        .edit-mode { animation: wiggle 0.3s infinite; border: 2px solid var(--teal-2026) !important; }
-        @keyframes wiggle { 0% {transform:rotate(-1deg)} 50% {transform:rotate(1deg)} 100% {transform:rotate(-1deg)} }
+        .dock-item { font-size: 28px; }
+        .ai-voice-btn {
+            width: 65px; height: 65px; background: var(--teal-master);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            color: white; margin-top: -40px; box-shadow: 0 10px 20px rgba(0,128,128,0.4);
+        }
+
+        /* انیمیشن لرزش برای ویرایش چیدمان */
+        .edit-active { animation: shake 0.3s infinite; border: 2px solid var(--teal-master) !important; }
+        @keyframes shake { 0% {transform: rotate(-1deg)} 50% {transform: rotate(1deg)} 100% {transform: rotate(-1deg)} }
     </style>
 </head>
 <body>
 
-    <div class="main-logo">💎</div>
-
-    <div class="grid-container" id="appGrid">
-        <div class="module-card" data-id="finance" style="border-right: 5px solid var(--teal-2026);">
-            <span class="icon-box">💰</span>
-            <div class="module-title">حسابداری مالی</div>
-            <div class="finance-badge" style="background: #FFE5E5; color: var(--red-debt);">بدهی: ۱۲,۴۰۰,۰۰۰</div>
+    <div class="header">
+        <div>
+            <span style="color: var(--teal-master); font-weight: bold; font-size: 12px;">PROJECT 2026</span>
+            <div style="font-size: 20px; font-weight: 900;">پنل مدیریتی دکتر مهدی</div>
         </div>
+        <div style="background: var(--teal-master); padding: 10px; border-radius: 15px; color: white;">💎</div>
+    </div>
 
-        <div class="module-card" data-id="implant" style="border-right: 5px solid #607D8B;">
-            <span class="icon-box">🔩</span>
-            <div class="module-title">پنل ایمپلنت</div>
-            <div class="finance-badge" style="background: #E8F5E9; color: var(--green-paid);">جراحی‌های امروز: ۳</div>
+    <div class="app-grid" id="mainGrid">
+        <div class="card" data-id="finance">
+            <span class="card-icon">💰</span>
+            <div class="card-title">امور مالی</div>
+            <div class="status-pill" style="background: #FFE5E5; color: var(--debt-red);">بدهکار: قرمز</div>
         </div>
-
-        <div class="module-card" data-id="patients">
-            <span class="icon-box">🧬</span>
-            <div class="module-title">پرونده ۳‌بعدی</div>
-            <div class="finance-badge" style="background: #E3F2FD; color: #1976D2;">۱۰۰,۰۰۰ رکورد</div>
+        <div class="card" data-id="implant">
+            <span class="card-icon">🔩</span>
+            <div class="card-title">ایمپلنتولوژی</div>
+            <div class="status-pill" style="background: #E8F5E9; color: var(--paid-green);">وضعیت: تسویه</div>
         </div>
-
-        <div class="module-card" data-id="ai">
-            <span class="icon-box">🧠</span>
-            <div class="module-title">هوش صوتی</div>
-            <div class="finance-badge" style="background: #F3E5F5; color: #7B1FA2;">آماده نوبت‌دهی</div>
+        <div class="card" data-id="patients">
+            <span class="card-icon">🧬</span>
+            <div class="card-title">پرونده ۳‌بعدی</div>
+            <div class="status-pill" style="background: #E3F2FD; color: #007AFF;">۱۰۰,۰۰۰ رکورد</div>
+        </div>
+        <div class="card" data-id="lab">
+            <span class="card-icon">🦷</span>
+            <div class="card-title">لابراتوار</div>
+            <div class="status-pill" style="background: #F3E5F5; color: #8E44AD;">ناژداکی / هژبری</div>
         </div>
     </div>
 
-    <div class="bottom-dock">
-        <div class="dock-btn">🏠</div>
-        <div class="dock-btn">📅</div>
-        <div class="center-btn">🎙️</div>
-        <div class="dock-btn">📦</div>
-        <div class="dock-btn">⚙️</div>
-    </div>
+    <nav class="dock">
+        <div class="dock-item">🏠</div>
+        <div class="dock-item">📅</div>
+        <div class="ai-voice-btn">🎙️</div>
+        <div class="dock-item">📦</div>
+        <div class="dock-item">⚙️</div>
+    </nav>
 
     <script>
-        const grid = document.getElementById('appGrid');
+        const grid = document.getElementById('mainGrid');
         let sortable = new Sortable(grid, {
             animation: 350,
             disabled: true,
             onEnd: () => {
                 const order = sortable.toArray();
-                localStorage.setItem('mehdi_order_2026', JSON.stringify(order));
+                localStorage.setItem('mehdi_stable_config', JSON.stringify(order));
             }
         });
 
-        let pressTimer;
-        document.body.addEventListener('touchstart', (e) => {
-            pressTimer = setTimeout(() => {
+        let timer;
+        document.body.addEventListener('touchstart', () => {
+            timer = setTimeout(() => {
                 sortable.option("disabled", false);
-                document.querySelectorAll('.module-card').forEach(el => el.classList.add('edit-mode'));
+                document.querySelectorAll('.card').forEach(c => c.classList.add('edit-active'));
                 if(window.navigator.vibrate) window.navigator.vibrate(200);
             }, 5000);
         });
 
-        document.body.addEventListener('touchend', () => clearTimeout(pressTimer));
+        document.body.addEventListener('touchend', () => clearTimeout(timer));
 
-        // بستن حالت ویرایش با تپ روی پس‌زمینه
+        // ذخیره و خروج از حالت ویرایش با کلیک روی فضای خالی
         document.body.addEventListener('click', (e) => {
             if (e.target.tagName === 'BODY') {
                 sortable.option("disabled", true);
-                document.querySelectorAll('.module-card').forEach(el => el.classList.remove('edit-mode'));
+                document.querySelectorAll('.card').forEach(c => c.classList.remove('edit-active'));
             }
         });
     </script>
