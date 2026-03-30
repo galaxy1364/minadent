@@ -1,33 +1,55 @@
-/* --- هسته مدیریت بیماران نامحدود (Infinite Patient Core) --- */
+<div id="smartModal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-header">
+            <span class="close-btn">×</span>
+            <div style="text-align: right;">
+                <div style="font-weight: 900; font-size: 18px;">ثبت نوبت / خدمات</div>
+                <div style="font-size: 11px; color: #888;">ظاهر شبیه بانکت • ساده، تمیز، سریع</div>
+            </div>
+        </div>
 
-const PatientDatabase = {
-    // ۱. ایجاد شناسه منحصر به فرد جهانی برای هر بیمار
-    generatePatientID: function() {
-        return 'PAT-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
-    },
+        <div class="input-group">
+            <label>نام بیمار</label>
+            <input type="text" placeholder="مثلاً: علی رضا" class="standard-input">
+        </div>
 
-    // ۲. متد جستجوی فوق سریع (استاندارد ۲۰۲۶)
-    searchPatient: function(query, allPatients) {
-        // فیلتر کردن هوشمند بدون فشار به رم گوشی
-        return allPatients.filter(p => 
-            p.name.includes(query) || 
-            p.fileNumber.toString() === query ||
-            p.phone.includes(query)
-        ).slice(0, 20); // فقط ۲۰ مورد اول را برای سرعت نمایش می‌دهد
-    },
+        <div class="input-row">
+            <div class="input-group">
+                <label>نوع یونیت</label>
+                <select class="standard-select">
+                    <option>یونیت ۱ (آبی)</option>
+                    <option>یونیت ۲ (زرد)</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label>ساعت</label>
+                <input type="time" class="standard-input">
+            </div>
+        </div>
 
-    // ۳. اتصال پرونده به بخش مالی و ایمپلنت
-    linkToFinance: function(patientId, amount, description) {
-        const transaction = {
-            id: patientId,
-            val: amount,
-            desc: description,
-            timestamp: new Date().toISOString()
-        };
-        // ثبت در زنجیره مالی بدون تداخل با پرونده پزشکی
-        console.log("تراکنش مالی به پرونده متصل و قفل شد.");
+        <button class="submit-btn-orange">ثبت نوبت و ارسال پیامک</button>
+        <p style="font-size: 9px; color: #aaa; text-align: center; margin-top: 10px;">
+            دمو: پیامک بدون نام پزشک ارسال می‌شود (استاندارد حفظ حریم خصوصی).
+        </p>
+    </div>
+</div>
+
+<style>
+    .modal-overlay { background: rgba(0,0,0,0.4); backdrop-filter: blur(5px); position: fixed; inset: 0; display: flex; align-items: flex-end; z-index: 5000; }
+    .modal-content { background: white; width: 100%; border-radius: 40px 40px 0 0; padding: 25px; box-sizing: border-box; animation: slideUp 0.4s ease; }
+    @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+    
+    .standard-input, .standard-select {
+        width: 100%; background: #F2F2F7; border: none; border-radius: 15px;
+        padding: 15px; margin-top: 5px; font-size: 16px; outline: none;
     }
-};
-
-// قفل کردن هسته در لایه پایدار برنامه
-localStorage.setItem('DrMehdi_Infinite_DB', JSON.stringify(PatientDatabase));
+    .input-group { margin-bottom: 15px; text-align: right; }
+    .input-group label { font-size: 13px; font-weight: bold; color: #666; margin-right: 5px; }
+    .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    
+    .submit-btn-orange {
+        width: 100%; background: linear-gradient(to right, #FF9500, #FF5E3A);
+        border: none; border-radius: 18px; padding: 18px; color: white;
+        font-weight: 900; font-size: 17px; box-shadow: 0 10px 20px rgba(255,149,0,0.3);
+    }
+</style>
