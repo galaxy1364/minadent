@@ -6,56 +6,106 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <title>MinaDent Ultra 2026</title>
     <style>
-        :root { --teal: #008080; --bg: #09090b; --card: #1c1c1e; --red: #ff453a; --green: #32d74b; --orange: #ff9f0a; }
+        :root {
+            --teal: #008080;
+            --bg: #09090b;
+            --debt-red: #ff453a;
+            --paid-green: #32d74b;
+            --pending-orange: #ff9f0a;
+        }
         body { margin: 0; background: var(--bg); color: white; font-family: -apple-system, sans-serif; overflow: hidden; height: 100vh; }
-        .header { padding: 60px 20px 20px; background: linear-gradient(180deg, rgba(0,128,128,0.2) 0%, transparent 100%); display: flex; justify-content: space-between; }
-        .app-rail { display: flex; width: 400vw; height: calc(100vh - 180px); transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); }
-        .page { width: 100vw; overflow-y: auto; padding: 15px; box-sizing: border-box; }
-        .card { background: var(--card); border-radius: 25px; padding: 20px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.1); }
-        .badge { display: inline-block; padding: 4px 10px; border-radius: 8px; font-size: 11px; font-weight: bold; margin-bottom: 8px; }
-        .badge-debt { background: rgba(255,69,58,0.2); color: var(--red); }
-        .badge-paid { background: rgba(50,215,75,0.2); color: var(--green); }
-        .badge-pending { background: rgba(255,159,10,0.2); color: var(--orange); }
-        .dock { position: fixed; bottom: 30px; left: 20px; right: 20px; height: 75px; background: rgba(255,255,255,0.1); backdrop-filter: blur(30px); border-radius: 30px; display: flex; justify-content: space-around; align-items: center; border: 1px solid rgba(255,255,255,0.1); }
-        .dock-item { opacity: 0.5; text-align: center; font-size: 10px; }
-        .dock-item.active { opacity: 1; color: var(--teal); transform: translateY(-5px); }
+        
+        /* هدر مدیریت */
+        .header { padding: 50px 20px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        
+        .app-rail { display: flex; width: 400vw; height: calc(100vh - 170px); transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1); }
+        .page { width: 100vw; overflow-y: auto; padding: 20px; box-sizing: border-box; }
+
+        /* کارت‌های رنگی هوشمند بر اساس وضعیت */
+        .patient-card {
+            border-radius: 22px; padding: 20px; margin-bottom: 15px;
+            border: 2px solid transparent; backdrop-filter: blur(10px);
+            transition: 0.3s;
+        }
+
+        /* استایل بدهکار (قرمز) */
+        .status-debt {
+            background: rgba(255, 69, 58, 0.1);
+            border-color: var(--debt-red);
+            color: var(--debt-red);
+        }
+        .status-debt h4, .status-debt span { color: var(--debt-red); font-weight: 900; }
+
+        /* استایل تسویه (سبز) */
+        .status-paid {
+            background: rgba(50, 215, 75, 0.1);
+            border-color: var(--paid-green);
+            color: var(--paid-green);
+        }
+        .status-paid h4, .status-paid span { color: var(--paid-green); font-weight: 900; }
+
+        /* استایل موعد نرسیده (نارنجی) */
+        .status-pending {
+            background: rgba(255, 159, 10, 0.1);
+            border-color: var(--pending-orange);
+            color: var(--pending-orange);
+        }
+        .status-pending h4, .status-pending span { color: var(--pending-orange); font-weight: 900; }
+
+        .mablagh { font-size: 20px; display: block; margin-top: 5px; }
+
+        /* داک پایین */
+        .dock { position: fixed; bottom: 25px; left: 20px; right: 20px; height: 75px; background: rgba(255,255,255,0.08); backdrop-filter: blur(30px); border-radius: 28px; display: flex; justify-content: space-around; align-items: center; border: 1px solid rgba(255,255,255,0.1); }
+        .dock-item { opacity: 0.4; text-align: center; font-size: 11px; cursor: pointer; }
+        .dock-item.active { opacity: 1; color: var(--teal); transform: scale(1.1); }
     </style>
 </head>
 <body>
+
     <div class="header">
-        <div><small style="opacity:0.6">مدیریت عالی</small><div style="font-size:20px; font-weight:bold">دکتر مهدی</div></div>
-        <div style="width:45px; height:45px; background:var(--teal); border-radius:12px; display:flex; align-items:center; justify-content:center; animation: pulse 2s infinite">💎</div>
+        <div><small style="opacity:0.5">مدیریت کلینیک</small><div style="font-size:22px; font-weight:bold">دکتر مهدی</div></div>
+        <div style="width:45px; height:45px; background:var(--teal); border-radius:15px; display:flex; align-items:center; justify-content:center; box-shadow: 0 0 20px var(--teal)">💎</div>
     </div>
-    <div class="app-rail" id="rail">
-        <section class="page"> <h3 style="color:var(--teal)">وضعیت آنی مالی</h3>
-            <div class="card">
-                <span class="badge badge-debt">مانده بدهی (قرمز)</span>
-                <div style="font-size:18px">بیمار: مریم احمدی</div>
-                <div style="font-size:13px; opacity:0.7">مبلغ مانده: ۱۲,۰۰۰,۰۰۰ ت</div>
+
+    <div class="app-rail" id="mainRail">
+        <section class="page">
+            <h3 style="color:var(--teal); margin-bottom:20px;">لیست بیماران و تراکنش‌ها</h3>
+            
+            <div class="patient-card status-debt">
+                <h4>🔴 مریم احمدی (بدهکار)</h4>
+                <span>باقیمانده: ۱۲,۵۰۰,۰۰۰ تومان</span>
+                <small style="display:block; margin-top:5px;">توضیحات: ایمپلنت واحد ۲ - تحویل روکش مانده</small>
             </div>
-            <div class="card">
-                <span class="badge badge-paid">تسویه (سبز)</span>
-                <div style="font-size:18px">بیمار: رضا شاکری</div>
+
+            <div class="patient-card status-pending">
+                <h4>🟠 رضا شاکری (موعد نرسیده)</h4>
+                <span>قسط بعدی: ۴,۰۰۰,۰۰۰ تومان</span>
+                <small style="display:block; margin-top:5px;">تاریخ سررسید: ۱۵ دی ماه</small>
             </div>
-            <div class="card">
-                <span class="badge badge-pending">موعد نرسیده (زرد/نارنجی)</span>
-                <div style="font-size:18px">بیمار: علی علوی</div>
+
+            <div class="patient-card status-paid">
+                <h4>🟢 علی علوی (تسویه کامل)</h4>
+                <span>کل پرداختی: ۳۵,۰۰۰,۰۰۰ تومان</span>
+                <small style="display:block; margin-top:5px;">بدون بدهی ✅</small>
             </div>
         </section>
-        <section class="page"><h3>جراحی و ایمپلنت</h3><div class="card"><p>فرمول: ۱۰۰٪ فیکسچر/اباتمنت برای مدیر</p></div></section>
-        <section class="page"><h3>نوبت‌دهی اکرم</h3></section>
-        <section class="page"><h3>هوش مصنوعی</h3></section>
+
+        <section class="page"><h3>بخش جراحی</h3></section>
+        <section class="page"><h3>نوبت‌دهی</h3></section>
+        <section class="page"><h3>تنظیمات AI</h3></section>
     </div>
+
     <nav class="dock">
-        <div class="dock-item active" onclick="go(0,this)">💰<br>مالی</div>
-        <div class="dock-item" onclick="go(1,this)">🦷<br>جراحی</div>
-        <div class="dock-item" onclick="go(2,this)">📅<br>نوبت</div>
-        <div class="dock-item" onclick="go(3,this)">🧠<br>هوش</div>
+        <div class="dock-item active" onclick="move(0,this)">💰<br>مالی</div>
+        <div class="dock-item" onclick="move(1,this)">🦷<br>جراحی</div>
+        <div class="dock-item" onclick="move(2,this)">📅<br>نوبت</div>
+        <div class="dock-item" onclick="move(3,this)">⚙️<br>تنظیمات</div>
     </nav>
+
     <script>
-        function go(i,el){
-            document.getElementById('rail').style.transform=`translateX(${i*100}vw)`;
-            document.querySelectorAll('.dock-item').forEach(d=>d.classList.remove('active'));
+        function move(idx, el) {
+            document.getElementById('mainRail').style.transform = `translateX(${idx * 100}vw)`;
+            document.querySelectorAll('.dock-item').forEach(d => d.classList.remove('active'));
             el.classList.add('active');
         }
     </script>
