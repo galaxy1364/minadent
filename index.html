@@ -1,55 +1,71 @@
-<div id="smartModal" class="modal-overlay">
-    <div class="modal-content">
-        <div class="modal-header">
-            <span class="close-btn">×</span>
-            <div style="text-align: right;">
-                <div style="font-weight: 900; font-size: 18px;">ثبت نوبت / خدمات</div>
-                <div style="font-size: 11px; color: #888;">ظاهر شبیه بانکت • ساده، تمیز، سریع</div>
-            </div>
+<div id="bookingPage" style="background: white; position: fixed; inset: 0; z-index: 9000; display: flex; flex-direction: column;">
+    
+    <div style="padding: 50px 20px 20px; background: #F9F9F9; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #EEE;">
+        <span style="font-size: 24px; cursor: pointer;" onclick="closeBooking()">✕</span>
+        <div style="text-align: right;">
+            <div style="font-weight: 900; font-size: 18px;">نوبت‌دهی فول‌اسکرین</div>
+            <div style="font-size: 11px; color: var(--teal-master);">استاندارد ۲۰۲۶ • مدیریت نوبت‌ها</div>
+        </div>
+    </div>
+
+    <div style="padding: 20px; overflow-y: auto; flex: 1;">
+        
+        <div class="input-block">
+            <label>نام و نام خانوادگی بیمار *</label>
+            <input type="text" id="pName" placeholder="مثلاً: محمد حسینی" class="v9-input">
         </div>
 
-        <div class="input-group">
-            <label>نام بیمار</label>
-            <input type="text" placeholder="مثلاً: علی رضا" class="standard-input">
+        <div class="input-block">
+            <label>شماره موبایل (جهت پیامک) *</label>
+            <input type="tel" id="pCell" placeholder="09120000000" class="v9-input" dir="ltr">
         </div>
 
-        <div class="input-row">
-            <div class="input-group">
-                <label>نوع یونیت</label>
-                <select class="standard-select">
-                    <option>یونیت ۱ (آبی)</option>
-                    <option>یونیت ۲ (زرد)</option>
-                </select>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+            <div class="input-block">
+                <label>تعیین وقت (تاریخ)</label>
+                <input type="date" class="v9-input">
             </div>
-            <div class="input-group">
+            <div class="input-block">
                 <label>ساعت</label>
-                <input type="time" class="standard-input">
+                <input type="time" class="v9-input">
             </div>
         </div>
 
-        <button class="submit-btn-orange">ثبت نوبت و ارسال پیامک</button>
-        <p style="font-size: 9px; color: #aaa; text-align: center; margin-top: 10px;">
-            دمو: پیامک بدون نام پزشک ارسال می‌شود (استاندارد حفظ حریم خصوصی).
-        </p>
+        <div class="input-block">
+            <label>توسط کادر:</label>
+            <select class="v9-input">
+                <option>دکتر مهدی (مدیر)</option>
+                <option>دکتر مینا مازندرانی</option>
+                <option>اکرم عیدی (منشی)</option>
+            </select>
+        </div>
+
+        <div style="margin-top: 30px;">
+            <button class="v9-submit-btn" onclick="saveBooking()">ثبت نوبت و ارسال پیامک تایید</button>
+            <button class="v9-online-btn">فعال‌سازی نوبت‌دهی آنلاین</button>
+        </div>
     </div>
 </div>
 
 <style>
-    .modal-overlay { background: rgba(0,0,0,0.4); backdrop-filter: blur(5px); position: fixed; inset: 0; display: flex; align-items: flex-end; z-index: 5000; }
-    .modal-content { background: white; width: 100%; border-radius: 40px 40px 0 0; padding: 25px; box-sizing: border-box; animation: slideUp 0.4s ease; }
-    @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-    
-    .standard-input, .standard-select {
-        width: 100%; background: #F2F2F7; border: none; border-radius: 15px;
-        padding: 15px; margin-top: 5px; font-size: 16px; outline: none;
+    .v9-input {
+        width: 100%; background: #F2F2F7; border: 2px solid transparent; border-radius: 18px;
+        padding: 18px; font-size: 16px; margin-top: 8px; box-sizing: border-box; outline: none;
+        transition: 0.3s;
     }
-    .input-group { margin-bottom: 15px; text-align: right; }
-    .input-group label { font-size: 13px; font-weight: bold; color: #666; margin-right: 5px; }
-    .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    
-    .submit-btn-orange {
-        width: 100%; background: linear-gradient(to right, #FF9500, #FF5E3A);
-        border: none; border-radius: 18px; padding: 18px; color: white;
-        font-weight: 900; font-size: 17px; box-shadow: 0 10px 20px rgba(255,149,0,0.3);
+    .v9-input:focus { border-color: var(--teal-master); background: white; }
+    .input-block { margin-bottom: 20px; text-align: right; }
+    .input-block label { font-weight: bold; font-size: 14px; color: #444; margin-right: 8px; }
+
+    .v9-submit-btn {
+        width: 100%; background: linear-gradient(135deg, #FF9500, #FF5E3A);
+        color: white; border: none; border-radius: 20px; padding: 20px;
+        font-weight: 900; font-size: 18px; box-shadow: 0 10px 25px rgba(255,94,58,0.3);
+        cursor: pointer;
+    }
+    .v9-online-btn {
+        width: 100%; background: white; color: var(--teal-master);
+        border: 2px solid var(--teal-master); border-radius: 20px; padding: 15px;
+        font-weight: bold; margin-top: 15px; cursor: pointer;
     }
 </style>
