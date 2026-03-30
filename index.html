@@ -4,138 +4,117 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <title>MinaDent Ultra 2026 - Live System</title>
+    <title>MinaDent Ultra 2026 - Master Core</title>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <style>
         :root {
-            --primary: #008080; --bg: #ffffff;
-            --color-finance: #E0F7FA; --color-lab: #F3E5F5; --color-inventory: #FFF3E0; --color-appt: #E3F2FD;
-            --color-patient: #E8F5E9; --color-ai: #FFEBEE; --color-implant: #E0F2F1; --color-unit: #FFFDE7;
+            --bg: #ffffff; --primary: #008080;
+            --c1: #E0F7FA; --c2: #F3E5F5; --c3: #FFF3E0; --c4: #E3F2FD;
+            --c5: #E8F5E9; --c6: #FFEBEE; --c7: #E0F2F1; --c8: #FCE4EC;
+            --c9: #FFFDE7; --c10: #EFEBE9; --c11: #E8EAF6; --c12: #ECEFF1;
         }
 
-        body { margin: 0; background: var(--bg); font-family: -apple-system, sans-serif; overflow-x: hidden; -webkit-user-select: none; }
+        body { margin: 0; background: var(--bg); font-family: -apple-system, sans-serif; overflow-x: hidden; touch-action: manipulation; }
 
-        /* انیمیشن لرزش برای جابجایی */
-        @keyframes wiggle {
-            0% { transform: rotate(-1deg); }
-            50% { transform: rotate(1deg); }
-            100% { transform: rotate(-1deg); }
-        }
-        .reordering { animation: wiggle 0.2s infinite; border: 2px dashed var(--primary) !important; opacity: 0.8; }
+        .header { padding: 50px 20px 10px; background: #fff; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; }
 
-        .header { padding: 50px 20px 10px; background: #fff; border-bottom: 1px solid #eee; }
-        
-        /* گرید اصلی با کاشی‌های زنده */
-        .main-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 20px 20px 150px; }
-        
+        /* گرید هوشمند با قابلیت جابجایی */
+        .main-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 20px; padding-bottom: 150px; }
+
         .tile {
-            border-radius: 24px; padding: 20px; text-align: center;
-            border: 1px solid rgba(0,0,0,0.03); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.03); position: relative;
+            border-radius: 26px; padding: 22px; text-align: center;
+            border: 1px solid rgba(0,0,0,0.03); box-shadow: 0 10px 25px rgba(0,0,0,0.04);
+            cursor: grab; transition: transform 0.2s; position: relative;
         }
-        .tile-icon { font-size: 32px; margin-bottom: 8px; display: block; }
-        .tile-title { font-size: 13px; font-weight: 800; }
-        
-        /* دیتای زنده روی کاشی */
-        .live-data {
-            margin-top: 8px; font-size: 11px; font-weight: bold; padding: 4px 8px;
-            background: rgba(255,255,255,0.5); border-radius: 10px; display: inline-block;
-        }
+        .tile:active { cursor: grabbing; transform: scale(1.05); z-index: 10; }
+        .tile-icon { font-size: 38px; display: block; margin-bottom: 8px; filter: drop-shadow(0 5px 10px rgba(0,0,0,0.1)); }
+        .tile-title { font-size: 14px; font-weight: 900; color: #333; }
+        .live-tag { position: absolute; top: 12px; right: 12px; font-size: 9px; background: rgba(255,255,255,0.7); padding: 2px 6px; border-radius: 8px; font-weight: bold; }
 
-        /* داک هوشمند اسکرولی */
-        .dock-container {
-            position: fixed; bottom: 25px; left: 15px; right: 15px; height: 80px;
-            background: rgba(255,255,255,0.95); backdrop-filter: blur(20px);
-            border-radius: 28px; border: 1px solid rgba(0,0,0,0.1); z-index: 3000; overflow: hidden;
+        /* داک پایین اسکرولی و جابجا شونده */
+        .dock-wrapper {
+            position: fixed; bottom: 25px; left: 15px; right: 15px; height: 85px;
+            background: rgba(255,255,255,0.9); backdrop-filter: blur(25px);
+            border-radius: 30px; border: 1px solid rgba(0,0,0,0.1); z-index: 3000; box-shadow: 0 15px 40px rgba(0,0,0,0.1);
         }
-        .dock-scroll { display: flex; align-items: center; gap: 8px; padding: 0 15px; height: 100%; overflow-x: auto; scrollbar-width: none; }
-        .dock-scroll::-webkit-scrollbar { display: none; }
+        .dock-list { display: flex; align-items: center; gap: 10px; padding: 0 15px; height: 100%; overflow-x: auto; scrollbar-width: none; }
+        .dock-list::-webkit-scrollbar { display: none; }
         
         .dock-item {
-            flex: 0 0 60px; height: 60px; border-radius: 18px;
+            flex: 0 0 65px; height: 65px; border-radius: 18px;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            transition: 0.3s; font-size: 20px;
+            font-size: 22px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);
         }
-        .dock-item small { font-size: 8px; margin-top: 2px; font-weight: bold; }
+        .dock-item small { font-size: 8px; font-weight: bold; margin-top: 3px; }
+
+        /* افکت ذخیره سازی */
+        .save-indicator {
+            position: fixed; top: 110px; left: 50%; transform: translateX(-50%);
+            background: var(--primary); color: white; padding: 8px 20px; border-radius: 20px;
+            font-size: 12px; font-weight: bold; display: none; z-index: 4000;
+        }
     </style>
 </head>
-<body>
+<body onclick="confirmSave()">
+
+    <div id="saveMsg" class="save-indicator">✅ تغییرات ذخیره و قفل شد</div>
 
     <div class="header">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-            <div><small style="color:var(--primary)">Live Core v2.0</small><div style="font-size:20px; font-weight:900;">مدیریت هوشمند دکتر مهدی</div></div>
-            <div id="status-sync" style="font-size:10px; color:green;">● آنلاین و سینک</div>
-        </div>
+        <div><small style="color:var(--primary)">System Stable 2026</small><div style="font-size:20px; font-weight:900;">مدیریت متمرکز دکتر مهدی</div></div>
+        <div style="background:var(--primary); color:white; width:40px; height:40px; border-radius:12px; display:flex; align-items:center; justify-content:center;">💎</div>
     </div>
 
-    <div class="main-grid" id="mainGrid">
-        <div class="tile" id="tile-finance" style="background:var(--color-finance)" oncontextmenu="return false;">
-            <span class="tile-icon">💰</span>
-            <div class="tile-title">امور مالی</div>
-            <div class="live-data" style="color:red;">بدهی: ۱۲,۴۰۰,۰۰۰</div>
-        </div>
-
-        <div class="tile" id="tile-lab" style="background:var(--color-lab)">
-            <span class="tile-icon">🦷</span>
-            <div class="tile-title">لابراتوار</div>
-            <div class="live-data" style="color:orange;">۲ کار در حال ارسال</div>
-        </div>
-
-        <div class="tile" id="tile-appt" style="background:var(--color-appt)">
-            <span class="tile-icon">📅</span>
-            <div class="tile-title">نوبت بعدی</div>
-            <div class="live-data" style="color:var(--primary);">۱۶:۳۰ - احمدی</div>
-        </div>
-
-        <div class="tile" id="tile-ai" style="background:var(--color-ai)">
-            <span class="tile-icon">🧠</span>
-            <div class="tile-title">هوش مصنوعی</div>
-            <div class="live-data">آماده پردازش صوت</div>
-        </div>
+    <div class="main-grid" id="masterGrid">
+        <div class="tile" data-id="1" style="background:var(--c1)"><span class="live-tag">LIVE</span><span class="tile-icon">💰</span><div class="tile-title">امور مالی</div></div>
+        <div class="tile" data-id="2" style="background:var(--c2)"><span class="live-tag">⏳</span><span class="tile-icon">🦷</span><div class="tile-title">لابراتوار</div></div>
+        <div class="tile" data-id="3" style="background:var(--c3)"><span class="live-tag">📦</span><span class="tile-icon">📦</span><div class="tile-title">انبارگردانی</div></div>
+        <div class="tile" data-id="4" style="background:var(--c4)"><span class="live-tag">NEW</span><span class="tile-icon">📅</span><div class="tile-title">نوبت‌دهی</div></div>
+        <div class="tile" data-id="5" style="background:var(--c5)"><span class="live-tag">100K</span><span class="tile-icon">🧬</span><div class="tile-title">بیماران</div></div>
+        <div class="tile" data-id="6" style="background:var(--c6)"><span class="live-tag">GPT</span><span class="tile-icon">🧠</span><div class="tile-title">هوش‌مصنوعی</div></div>
+        <div class="tile" data-id="7" style="background:var(--c7)"><span class="live-tag">💎</span><span class="tile-icon">🔩</span><div class="tile-title">ایمپلنت</div></div>
+        <div class="tile" data-id="8" style="background:var(--c8)"><span class="live-tag">🛡️</span><span class="tile-icon">🏥</span><div class="tile-title">بیمه‌ها</div></div>
+        <div class="tile" data-id="9" style="background:var(--c9)"><span class="live-tag">OFF</span><span class="tile-icon">🛋️</span><div class="tile-title">یونیت‌ها</div></div>
+        <div class="tile" data-id="10" style="background:var(--c10)"><span class="live-tag">STAFF</span><span class="tile-icon">👩‍⚕️</span><div class="tile-title">پرسنل</div></div>
+        <div class="tile" data-id="11" style="background:var(--c11)"><span class="live-tag">REP</span><span class="tile-icon">📊</span><div class="tile-title">گزارشات</div></div>
+        <div class="tile" data-id="12" style="background:var(--c12)"><span class="live-tag">SET</span><span class="tile-icon">⚙️</span><div class="tile-title">تنظیمات</div></div>
     </div>
 
-    <div class="dock-container">
-        <div class="dock-scroll" id="dockScroll">
-            <div class="dock-item" style="background:var(--color-finance)"><span>💰</span><small>مالی</small></div>
-            <div class="dock-item" style="background:var(--color-lab)"><span>🦷</span><small>لاب</small></div>
-            <div class="dock-item" style="background:var(--color-inventory)"><span>📦</span><small>انبار</small></div>
-            <div class="dock-item" style="background:var(--color-appt)"><span>📅</span><small>نوبت</small></div>
-            <div class="dock-item" style="background:var(--color-patient)"><span>🧬</span><small>بیمار</small></div>
+    <div class="dock-wrapper">
+        <div class="dock-list" id="masterDock">
+            <div class="dock-item" style="background:var(--c1)"><span>💰</span><small>مالی</small></div>
+            <div class="dock-item" style="background:var(--c2)"><span>🦷</span><small>لاب</small></div>
+            <div class="dock-item" style="background:var(--c6)"><span>🧠</span><small>هوش</small></div>
+            <div class="dock-item" style="background:var(--c4)"><span>📅</span><small>نوبت</small></div>
+            <div class="dock-item" style="background:var(--c5)"><span>🧬</span><small>پرونده</small></div>
         </div>
     </div>
 
     <script>
-        // منطق جابجایی با نگه داشتن ۵ ثانیه (Long Press)
-        let timer;
-        const tiles = document.querySelectorAll('.tile, .dock-item');
+        // فعالسازی قابلیت جابجایی مغناطیسی برای گرید و داک
+        new Sortable(document.getElementById('masterGrid'), { animation: 150, ghostClass: 'blue-background-class' });
+        new Sortable(document.getElementById('masterDock'), { animation: 150, scroll: true });
 
-        tiles.forEach(item => {
-            item.addEventListener('touchstart', (e) => {
-                timer = setTimeout(() => {
-                    activateReorderMode();
-                }, 3000); // برای راحتی روی ۳ ثانیه تنظیم شد، طبق دستور شما به ۵ قابل تغییر است
-            });
-
-            item.addEventListener('touchend', () => {
-                clearTimeout(timer);
-            });
-        });
-
-        function activateReorderMode() {
-            document.querySelectorAll('.tile').forEach(t => t.classList.add('reordering'));
-            alert("حالت جابجایی فعال شد. حالا می‌توانید ترتیب را عوض کنید. (تنظیمات ذخیره دائمی شد)");
+        // ذخیره سازی با یک تب (Click) روی صفحه
+        function confirmSave() {
+            const gridOrder = Array.from(document.querySelectorAll('#masterGrid .tile')).map(t => t.dataset.id);
+            localStorage.setItem('minadent_ultra_order', JSON.stringify(gridOrder));
+            
+            // نمایش افکت ذخیره
+            const msg = document.getElementById('saveMsg');
+            msg.style.display = 'block';
+            setTimeout(() => { msg.style.display = 'none'; }, 1500);
         }
 
-        // حفظ داده‌ها در حافظه محلی گوشی
-        function saveData() {
-            const gridOrder = document.getElementById('mainGrid').innerHTML;
-            localStorage.setItem('minadent_layout', gridOrder);
-        }
-
-        // بارگذاری خودکار پس از هر آپدیت
+        // بازیابی خودکار چیدمان بعد از آپدیت
         window.onload = () => {
-            const savedLayout = localStorage.getItem('minadent_layout');
-            if(savedLayout) {
-                // document.getElementById('mainGrid').innerHTML = savedLayout;
+            const savedOrder = JSON.parse(localStorage.getItem('minadent_ultra_order'));
+            if(savedOrder) {
+                const grid = document.getElementById('masterGrid');
+                const tiles = Array.from(grid.children);
+                savedOrder.forEach(id => {
+                    const tile = tiles.find(t => t.dataset.id === id);
+                    if(tile) grid.appendChild(tile);
+                });
             }
         }
     </script>
