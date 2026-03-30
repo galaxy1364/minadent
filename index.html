@@ -7,100 +7,93 @@
     <title>MinaDent Ultra 2026</title>
     <style>
         :root {
-            --teal: #008080; --bg: #09090b; --debt-red: #ff453a; --paid-green: #32d74b; --pending-orange: #ff9f0a;
+            --teal: #008080; --bg: #09090b; --red: #ff453a; --green: #32d74b; --orange: #ff9f0a;
         }
         body { margin: 0; background: var(--bg); color: white; font-family: -apple-system, sans-serif; overflow: hidden; height: 100vh; }
         .header { padding: 50px 20px 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.05); }
         .app-rail { display: flex; width: 400vw; height: calc(100vh - 160px); transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1); }
-        .page { width: 100vw; overflow-y: auto; padding: 20px; box-sizing: border-box; padding-bottom: 100px; }
+        .page { width: 100vw; overflow-y: auto; padding: 20px; box-sizing: border-box; padding-bottom: 120px; }
         
-        .patient-card { border-radius: 22px; padding: 15px; margin-bottom: 15px; border: 2px solid transparent; backdrop-filter: blur(10px); }
-        .status-debt { background: rgba(255, 69, 58, 0.1); border-color: var(--debt-red); color: var(--debt-red); }
-        .status-paid { background: rgba(50, 215, 75, 0.1); border-color: var(--paid-green); color: var(--paid-green); }
-        .status-pending { background: rgba(255, 159, 10, 0.1); border-color: var(--pending-orange); color: var(--pending-orange); }
+        /* کارت بیماران با مبالغ رنگی */
+        .patient-card { background: rgba(255,255,255,0.03); border-radius: 22px; padding: 18px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.1); }
+        .amt-red { color: var(--red); font-weight: bold; font-size: 22px; }
+        .amt-green { color: var(--green); font-weight: bold; font-size: 22px; }
+        .amt-orange { color: var(--orange); font-weight: bold; font-size: 22px; }
+        
+        /* نقشه دندان‌ها */
+        .tooth-grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 5px; margin-top: 15px; }
+        .tooth { width: 35px; height: 45px; background: #333; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 10px; cursor: pointer; transition: 0.2s; }
+        .tooth.selected { background: var(--teal); box-shadow: 0 0 15px var(--teal); }
 
-        /* دکمه‌های شیشه‌ای و مدرن */
-        .btn-scan {
-            background: linear-gradient(135deg, var(--teal), #005555); color: white; border: none;
-            padding: 15px; border-radius: 18px; width: 100%; font-size: 16px; font-weight: bold;
-            display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 15px;
-            box-shadow: 0 10px 20px rgba(0, 128, 128, 0.3);
-        }
-
-        /* ورودی‌های فرم */
-        .input-glass {
-            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
-            color: white; padding: 12px; border-radius: 12px; width: 100%; margin-bottom: 10px; box-sizing: border-box; font-family: inherit;
-        }
-
+        .btn-action { background: var(--teal); color: white; border: none; padding: 15px; border-radius: 15px; width: 100%; font-weight: bold; margin-top: 15px; }
         .dock { position: fixed; bottom: 25px; left: 20px; right: 20px; height: 75px; background: rgba(255,255,255,0.08); backdrop-filter: blur(30px); border-radius: 28px; display: flex; justify-content: space-around; align-items: center; border: 1px solid rgba(255,255,255,0.1); z-index: 1000; }
-        .dock-item { opacity: 0.4; text-align: center; font-size: 11px; cursor: pointer; transition: 0.3s; }
+        .dock-item { opacity: 0.4; text-align: center; font-size: 11px; }
         .dock-item.active { opacity: 1; color: var(--teal); transform: scale(1.1); }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <div><small style="opacity:0.5">مدیریت کلینیک</small><div style="font-size:22px; font-weight:bold">دکتر مهدی</div></div>
+        <div><small style="opacity:0.5">MinaDent Ultra</small><div style="font-size:22px; font-weight:bold">دکتر مهدی</div></div>
         <div style="width:45px; height:45px; background:var(--teal); border-radius:15px; display:flex; align-items:center; justify-content:center; box-shadow: 0 0 20px var(--teal)">💎</div>
     </div>
 
     <div class="app-rail" id="mainRail">
         
         <section class="page">
-            <h3 style="color:var(--teal); margin-bottom:15px;">لیست بیماران و تراکنش‌ها</h3>
+            <h3 style="color:var(--teal)">لیست تراکنش‌ها</h3>
             
-            <div class="patient-card status-debt">
-                <h4 style="margin:0 0 5px 0">🔴 مریم احمدی (بدهکار)</h4>
-                <span>باقیمانده: ۱۲,۵۰۰,۰۰۰ تومان</span>
-            </div>
-            <div class="patient-card status-pending">
-                <h4 style="margin:0 0 5px 0">🟠 رضا شاکری (موعد نرسیده)</h4>
-                <span>قسط بعدی: ۴,۰۰۰,۰۰۰ تومان</span>
+            <div class="patient-card">
+                <div style="margin-bottom:10px;">بیمار: مریم احمدی</div>
+                <div class="amt-red">۱۲,۵۰۰,۰۰۰ تومان</div>
+                <small style="opacity:0.5">وضعیت: بدهکار</small>
             </div>
 
-            <input type="file" accept="image/*" capture="environment" id="cameraInput" style="display:none;" onchange="processScan()">
-            <button class="btn-scan" onclick="document.getElementById('cameraInput').click()">
-                📸 اسکن فیش واریزی جدید
-            </button>
-            <p id="scanResult" style="color: var(--paid-green); font-size: 12px; text-align: center; margin-top: 10px;"></p>
+            <div class="patient-card">
+                <div style="margin-bottom:10px;">بیمار: علی علوی</div>
+                <div class="amt-green">۱۸,۰۰۰,۰۰۰ تومان</div>
+                <small style="opacity:0.5">وضعیت: تسویه کامل ✅</small>
+            </div>
+
+            <div class="patient-card">
+                <div style="margin-bottom:10px;">بیمار: رضا شاکری</div>
+                <div class="amt-orange">۴,۰۰۰,۰۰۰ تومان</div>
+                <small style="opacity:0.5">وضعیت: سررسید نارنجی (۱۵ دی)</small>
+            </div>
+            
+            <button class="btn-action" style="background:#222">📸 اسکن فیش بانکی</button>
         </section>
 
         <section class="page">
-            <h3 style="color:var(--teal); margin-bottom:15px;">پنل جراحی - دکتر مینا مازندرانی</h3>
-            <div style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 20px;">
-                <label style="font-size: 12px; opacity: 0.7;">کل هزینه دریافتی (تومان):</label>
-                <input type="number" id="totalFee" class="input-glass" placeholder="مثلاً 20000000">
-                
-                <label style="font-size: 12px; opacity: 0.7;">هزینه فیکسچر و اباتمنت (سهم ۱۰۰٪ مدیر):</label>
-                <input type="number" id="materialFee" class="input-glass" placeholder="مثلاً 8000000">
-                
-                <button class="btn-scan" onclick="calculateImplant()" style="margin-top: 10px;">📊 محاسبه سهم</button>
-                
-                <div id="calcResult" style="margin-top: 15px; display: none;">
-                    <div style="background: rgba(50, 215, 75, 0.2); color: var(--paid-green); padding: 10px; border-radius: 10px; margin-bottom: 5px;">
-                        سهم دکتر مهدی (مدیر): <span id="mgrShare" style="font-weight:bold;">0</span> ت
+            <h3 style="color:var(--teal)">نقشه دندان‌های جراحی</h3>
+            <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 20px;">
+                <p style="font-size: 13px; text-align: center;">دندان‌های مورد نظر را انتخاب کنید:</p>
+                <div class="tooth-grid" id="teeth">
                     </div>
-                    <div style="background: rgba(0, 128, 128, 0.2); color: white; padding: 10px; border-radius: 10px;">
-                        سهم دکتر مینا: <span id="minaShare" style="font-weight:bold;">0</span> ت
-                    </div>
+                <div style="margin-top:20px; border-top: 1px solid #444; padding-top: 15px;">
+                    <label style="font-size:12px; opacity:0.6">هزینه جراحی و ایمپلنت:</label>
+                    <input type="text" value="35,000,000" style="background:none; border:none; color:var(--teal); font-size:24px; font-weight:bold; width:100%;">
+                    <button class="btn-action" onclick="alert('محاسبه سهم مدیر و پزشک انجام شد')">ثبت در پرونده و سهم‌بندی</button>
                 </div>
             </div>
         </section>
 
         <section class="page">
-            <h3 style="color:var(--teal); margin-bottom:15px;">نوبت‌دهی - پنل اکرم عیدی</h3>
-            <div class="input-glass" style="text-align: center; padding: 30px;">
-                <div style="font-size: 40px; margin-bottom: 10px;">📅</div>
-                ثبت نوبت سریع (نام + موبایل)
+            <h3 style="color:var(--teal)">پنل اکرم عیدی</h3>
+            <div class="patient-card" style="text-align: center; padding: 40px;">
+                <div style="font-size: 40px;">📂</div>
+                ثبت پرونده جدید (۱۰،۰۰۰+)
                 <br><br>
-                <button class="btn-scan" style="background: #333;">+ نوبت جدید</button>
+                <button class="btn-action" style="background:#333">+ افزودن بیمار</button>
             </div>
         </section>
 
         <section class="page">
-            <h3 style="color:var(--teal);">تنظیمات سیستم</h3>
-            <p style="opacity:0.6; font-size:14px;">پایگاه داده: SQLite (آفلاین)<br>وضعیت سینک: متصل به سرور</p>
+            <h3 style="color:var(--teal)">مدیریت سیستم</h3>
+            <div class="patient-card">
+                <p>⚙️ تنظیمات FaceID فعال است</p>
+                <p>⚙️ بک‌آپ ابری (گیت‌هاب) متصل</p>
+            </div>
         </section>
     </div>
 
@@ -112,39 +105,20 @@
     </nav>
 
     <script>
-        // حرکت بین صفحات
+        // تولید نقشه دندان‌ها (۱ تا ۳۲)
+        const teethCont = document.getElementById('teeth');
+        for(let i=1; i<=32; i++) {
+            let div = document.createElement('div');
+            div.className = 'tooth';
+            div.innerText = i;
+            div.onclick = function() { this.classList.toggle('selected'); }
+            teethCont.appendChild(div);
+        }
+
         function move(idx, el) {
             document.getElementById('mainRail').style.transform = `translateX(${idx * -100}vw)`;
             document.querySelectorAll('.dock-item').forEach(d => d.classList.remove('active'));
             el.classList.add('active');
-        }
-
-        // شبیه‌سازی اسکن فیش بانکی
-        function processScan() {
-            let res = document.getElementById('scanResult');
-            res.innerText = "⏳ در حال تحلیل تصویر توسط هوش مصنوعی...";
-            setTimeout(() => {
-                res.innerText = "✅ اسکن موفق! مبلغ پرداختی استخراج شد و آماده ثبت در پرونده است.";
-            }, 2000);
-        }
-
-        // فرمول قطعی و قفل شده ایمپلنت
-        function calculateImplant() {
-            let total = parseInt(document.getElementById('totalFee').value) || 0;
-            let material = parseInt(document.getElementById('materialFee').value) || 0;
-            
-            // دستمزد خالص جراحی
-            let surgeryFee = total - material;
-            
-            // سهم مینا (50% از دستمزد خالص)
-            let minaShare = surgeryFee / 2;
-            
-            // سهم مدیر (100% قطعات + 50% دستمزد خالص)
-            let mgrShare = material + (surgeryFee / 2);
-
-            document.getElementById('mgrShare').innerText = mgrShare.toLocaleString();
-            document.getElementById('minaShare').innerText = minaShare.toLocaleString();
-            document.getElementById('calcResult').style.display = "block";
         }
     </script>
 </body>
